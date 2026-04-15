@@ -1,0 +1,52 @@
+# netlify.toml
+# ─────────────────────────────────────────────────────────────────────────────
+# CV Builder Pro — Netlify configuration
+# Place this file in the ROOT of your repository alongside cv-builder.html
+# ─────────────────────────────────────────────────────────────────────────────
+
+[build]
+  publish   = "."
+  functions = "netlify/functions"
+
+# ── Environment variables ─────────────────────────────────────────────────────
+# Also set these in Netlify dashboard → Site config → Environment variables.
+[build.environment]
+  PAYPAL_CLIENT_ID     = "ARXPT6z2HjMLJU5whPayBjbr2pi85RiGT4dQM4kIV5BD9dZjvmQVaho_YXPoFFt7B1kowgY1ptcrZV54"
+  PAYPAL_CLIENT_SECRET = "EKr9qCfVSDzznu_4WE-f_68zMVUwP2cV1cJsic7QcOu9SZfDGWNSMJIJ63XUv8Dr5GZpd3DQm4CrVuDw"
+  # Add your Anthropic key in the Netlify dashboard — never commit it to git:
+  # ANTHROPIC_API_KEY = "sk-ant-..."
+
+# ── Security headers ──────────────────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options         = "DENY"
+    X-Content-Type-Options  = "nosniff"
+    Referrer-Policy         = "strict-origin-when-cross-origin"
+    Permissions-Policy      = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/cv-builder.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# ── Redirects ─────────────────────────────────────────────────────────────────
+[[redirects]]
+  from = "/"
+  to   = "/cv-builder.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/generate"
+  to   = "/.netlify/functions/generate"
+  status = 200
+
+[[redirects]]
+  from = "/api/create-paypal-order"
+  to   = "/.netlify/functions/create-paypal-order"
+  status = 200
+
+[[redirects]]
+  from = "/api/capture-paypal-order"
+  to   = "/.netlify/functions/capture-paypal-order"
+  status = 200

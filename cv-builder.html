@@ -1,0 +1,3854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV Builder Pro — AI-Powered Resume Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --navy: #1a2744;
+    --navy-mid: #253460;
+    --gold: #c9a84c;
+    --gold-light: #f0d690;
+    --cream: #faf8f4;
+    --white: #ffffff;
+    --gray-100: #f5f4f1;
+    --gray-200: #e8e6e0;
+    --gray-400: #9e9b93;
+    --gray-600: #6b6860;
+    --gray-800: #3a3935;
+    --success: #2d6a4f;
+    --success-bg: #d8f3e8;
+    --danger: #9b2226;
+    --danger-bg: #fde8e9;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 20px rgba(26,39,68,0.08);
+    --shadow-lg: 0 8px 40px rgba(26,39,68,0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--gray-800);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--navy);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .header-logo {
+    font-family: 'Fraunces', serif;
+    color: var(--white);
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-logo span {
+    color: var(--gold);
+  }
+  .header-badge {
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* STEP INDICATOR */
+  .steps-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .step-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-400);
+    border-bottom: 3px solid transparent;
+    cursor: default;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .step-tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+  }
+  .step-tab.done {
+    color: var(--success);
+    border-bottom-color: transparent;
+  }
+  .step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    color: var(--gray-600);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+  .step-tab.active .step-num {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .step-tab.done .step-num {
+    background: var(--success-bg);
+    color: var(--success);
+  }
+
+  /* LAYOUT */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .section-panel {
+    display: none;
+  }
+  .section-panel.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-heading {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    color: var(--gray-600);
+    font-size: 14px;
+    margin-bottom: 2rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon {
+    font-size: 16px;
+  }
+
+  /* INPUTS */
+  .input-group {
+    margin-bottom: 1rem;
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  input[type="text"], input[type="email"], textarea, select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--gray-800);
+    background: var(--white);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  input[type="text"]:focus, input[type="email"]:focus,
+  textarea:focus, select:focus {
+    border-color: var(--navy);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  /* UPLOAD ZONES */
+  .upload-zone {
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--gray-100);
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--navy);
+    background: #eef1f9;
+  }
+  .upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+  .upload-zone p {
+    font-size: 14px;
+    color: var(--gray-600);
+  }
+  .upload-zone strong {
+    color: var(--navy);
+  }
+  .upload-zone input[type="file"] {
+    display: none;
+  }
+
+  /* OR DIVIDER */
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.25rem 0;
+    color: var(--gray-400);
+    font-size: 13px;
+  }
+  .or-divider::before, .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+  }
+
+  /* FILE BADGE */
+  .file-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--success-bg);
+    color: var(--success);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  /* TEMPLATE GRID */
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .template-card {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+  }
+  .template-card:hover {
+    border-color: var(--navy);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .template-card.selected {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(26,39,68,0.15);
+  }
+  .template-preview {
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 2px solid var(--gray-200);
+    transition: border-color 0.2s;
+  }
+  .template-card.selected .template-preview { border-bottom-color: var(--navy); }
+  .template-label {
+    padding: 10px 12px 8px;
+  }
+  .template-label strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .template-label span {
+    font-size: 10px;
+    color: var(--gray-400);
+    display: block;
+  }
+  .template-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .badge-pro   { background:#e8eef9; color:#1a2744; }
+  .badge-tech  { background:#d8f3e8; color:#2d6a4f; }
+  .badge-mod   { background:#f3e8ff; color:#5b21b6; }
+  .badge-stu   { background:#fef9c3; color:#854d0e; }
+  .badge-exec  { background:#fff1e6; color:#9a3412; }
+  .template-check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+  .template-card.selected .template-check {
+    display: flex;
+  }
+
+  /* MINI CV PREVIEWS */
+  .mini-cv {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    font-size: 4.5px;
+    line-height: 1.4;
+    transform-origin: top left;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    border: none;
+    text-align: center;
+  }
+  .btn-primary {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .btn-primary:hover {
+    background: var(--navy-mid);
+    transform: translateY(-1px);
+  }
+  .btn-gold {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .btn-gold:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--navy);
+    border: 1.5px solid var(--navy);
+  }
+  .btn-outline:hover {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .btn-ghost {
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: 1px solid var(--gray-200);
+  }
+  .btn-ghost:hover {
+    background: var(--gray-200);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-lg {
+    padding: 14px 28px;
+    font-size: 15px;
+  }
+
+  /* ACTIONS ROW */
+  .actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  /* GENERATING STATE */
+  .generating-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,39,68,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .generating-overlay.active {
+    display: flex;
+  }
+  .generating-box {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 3rem 2.5rem;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+  }
+  .spinner {
+    width: 52px;
+    height: 52px;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--navy);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 1.25rem;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .generating-box h3 {
+    font-family: 'Fraunces', serif;
+    color: var(--navy);
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .generating-box p {
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+  .gen-steps {
+    margin-top: 1.25rem;
+    text-align: left;
+  }
+  .gen-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--gray-400);
+    padding: 5px 0;
+  }
+  .gen-step.done { color: var(--success); }
+  .gen-step.active { color: var(--navy); font-weight: 500; }
+  .gen-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    flex-shrink: 0;
+  }
+  .gen-step.done .gen-dot { background: var(--success); }
+  .gen-step.active .gen-dot { background: var(--navy); animation: pulse 1s infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+
+  /* RESULT PANEL */
+  .result-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 700px) {
+    .result-cols { grid-template-columns: 1fr; }
+  }
+
+  .result-output {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .result-header {
+    background: var(--gray-100);
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .cv-text-output {
+    padding: 1.25rem;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--gray-800);
+    white-space: pre-wrap;
+    /* Fixed height so partial blur always shows top section clearly */
+    height: 520px;
+    max-height: 520px;
+    overflow: hidden;          /* hide scrollbar when locked */
+    font-family: 'DM Sans', sans-serif;
+    transition: height 0.4s ease, overflow 0.4s ease;
+  }
+  /* Re-enable scroll after unlock */
+  .cv-text-output.unlocked {
+    overflow-y: auto;
+    height: auto;
+    max-height: 600px;
+  }
+
+  /* SCORE BADGES */
+  .score-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 1.5rem;
+  }
+  @media(max-width:640px){ .score-row { grid-template-columns: repeat(2,1fr); } }
+
+  .score-badge {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 18px 12px 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-badge::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gray-200);
+    transition: background 0.4s;
+  }
+  .score-badge.clr-green::after { background: var(--success); }
+  .score-badge.clr-gold::after  { background: var(--gold); }
+  .score-badge.clr-red::after   { background: var(--danger); }
+  .score-badge:hover { transform: translateY(-2px); }
+
+  .score-ring {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+  }
+  .score-ring svg {
+    transform: rotate(-90deg);
+    width: 72px;
+    height: 72px;
+  }
+  .ring-bg {
+    fill: none;
+    stroke: var(--gray-200);
+    stroke-width: 6;
+  }
+  .ring-fill {
+    fill: none;
+    stroke: var(--gray-200);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 175.9;
+    stroke-dashoffset: 175.9;
+    transition: stroke-dashoffset 1.3s cubic-bezier(0.4,0,0.2,1),
+                stroke 0.4s ease;
+  }
+  .ring-val {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    transition: color 0.4s;
+  }
+  .score-badge .lbl {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  /* Colour variants applied via JS */
+  .ring-green  { stroke: var(--success) !important; }
+  .ring-gold   { stroke: var(--gold)    !important; }
+  .ring-red    { stroke: var(--danger)  !important; }
+  .val-green   { color: var(--success)  !important; }
+  .val-gold    { color: #8a6400         !important; }
+  .val-red     { color: var(--danger)   !important; }
+
+  /* ATS TIPS */
+  .ats-tips {
+    margin-top: 1.5rem;
+  }
+  .tip-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 13px;
+  }
+  .tip-item:last-child { border-bottom: none; }
+  .tip-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* GRID 2 */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media(max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* ALERT */
+  .alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .alert-info {
+    background: #e8eef9;
+    color: var(--navy);
+    border: 1px solid #b5c8f0;
+  }
+  .alert-success {
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid #a8dfc4;
+  }
+
+  /* COPY BTN ANIM */
+  .copied {
+    background: var(--success-bg) !important;
+    color: var(--success) !important;
+  }
+
+  /* DOWNLOAD SECTION */
+  .download-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  /* MOBILE */
+  @media(max-width: 600px) {
+    .main { padding: 1rem; }
+    .result-cols { grid-template-columns: 1fr; }
+  }
+
+  /* HIDDEN UTIL */
+  .hidden { display: none !important; }
+
+  /* TEMPLATE FILTER TABS */
+  .tpl-filter {
+    background: var(--gray-100);
+    border: 1.5px solid var(--gray-200);
+    color: var(--gray-600);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .tpl-filter:hover { border-color: var(--navy); color: var(--navy); }
+  .tpl-filter.active { background: var(--navy); border-color: var(--navy); color: white; }
+
+  /* TECH WARNING BANNER */
+  .tech-warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #664d03;
+    margin-top: 8px;
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .tech-warning.visible { display: flex; }
+
+  /* COVER LETTER GRID */
+  .cl-template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .cl-card {
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--white);
+    position: relative;
+  }
+  .cl-card:hover {
+    border-color: var(--navy);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .cl-card.selected {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(26,39,68,0.15);
+  }
+  .cl-card.selected .template-check { display: flex; }
+  .cl-preview {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 2px solid var(--gray-200);
+  }
+  .cl-card.selected .cl-preview { border-bottom-color: var(--navy); }
+  .cl-label {
+    padding: 10px 12px 8px;
+  }
+  .cl-label strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+  .cl-label span {
+    display: block;
+    font-size: 10px;
+    color: var(--gray-400);
+  }
+
+  /* RESULT TABS */
+  .result-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 1.25rem;
+  }
+  .result-tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-400);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .result-tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--navy);
+  }
+  .result-tab:hover { color: var(--navy); }
+  .result-pane { display: none; }
+  .result-pane.active { display: block; animation: fadeIn 0.25s ease; }
+
+  /* KEY TAG */
+  .key-tag {
+    display: inline-block;
+    background: var(--gold-light);
+    color: #7a5c00;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px;
+  }
+
+
+  /* ═══════════════════════════════════════════
+     PAYWALL — BLUR + UNLOCK OVERLAY
+  ═══════════════════════════════════════════ */
+
+  /* Blurred preview state */
+  /* ── Partial blur: top 45% readable, bottom 55% blurred ── */
+  .preview-blur {
+    position: relative;
+    user-select: none;
+    pointer-events: none;
+    transition: all 0.5s ease;
+  }
+
+  /* The blur effect is applied via a pseudo-element overlay on the bottom portion */
+  .blur-wrap {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  /* Readable top section — no blur */
+  .preview-blur::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: 42%;          /* blur starts at 42% down */
+    bottom: 0;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(255,255,255,0.15) 18%,
+      rgba(255,255,255,0.55) 45%,
+      rgba(255,255,255,0.82) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* When unlocked, remove the blur overlay */
+  .preview-blur.unlocked::after { display: none; }
+  .preview-blur.unlocked {
+    pointer-events: auto;
+    user-select: text;
+  }
+
+  /* Unlock overlay — anchored to bottom half, above the blur */
+  .unlock-overlay {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 0;
+    top: 38%;          /* only covers bottom 62% */
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(26,39,68,0.60) 25%,
+      rgba(26,39,68,0.88) 60%,
+      rgba(26,39,68,0.96) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 1.5rem 1.5rem;
+    gap: 10px;
+    z-index: 10;
+    text-align: center;
+    transition: opacity 0.4s ease;
+  }
+  .unlock-overlay.hidden { display: none; }
+  .unlock-overlay .lock-icon { font-size: 1.8rem; }
+  .unlock-overlay h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #fff;
+    margin: 0;
+  }
+  .unlock-overlay p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.80);
+    margin: 0;
+    max-width: 240px;
+    line-height: 1.4;
+  }
+  .unlock-overlay .price-badge {
+    background: var(--gold);
+    color: #1a1a1a;
+    font-weight: 800;
+    font-size: 1.15rem;
+    padding: 4px 16px;
+    border-radius: 40px;
+    letter-spacing: 0.02em;
+  }
+  .btn-unlock {
+    background: #fff;
+    color: var(--navy);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+  .btn-unlock:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  }
+
+  /* Download buttons locked state */
+  .dl-locked {
+    opacity: 0.45;
+    cursor: not-allowed !important;
+    pointer-events: none;
+  }
+
+  /* ═══════════════════════════════════════════
+     PAYMENT MODAL
+  ═══════════════════════════════════════════ */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,15,30,0.72);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-backdrop.hidden { display: none; }
+
+  .modal-box {
+    background: var(--white);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    overflow: hidden;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity:0; }
+    to   { transform: translateY(0);    opacity:1; }
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, var(--navy) 0%, #253460 100%);
+    color: white;
+    padding: 1.5rem 1.5rem 1.2rem;
+    text-align: center;
+  }
+  .modal-header .modal-icon { font-size: 2rem; margin-bottom: 6px; }
+  .modal-header h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: white;
+  }
+  .modal-header p { font-size: 13px; color: rgba(255,255,255,0.75); margin: 0; }
+
+  .modal-body { padding: 1.5rem; }
+
+  .modal-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--gray-200);
+  }
+  .modal-price-row .what {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .modal-price-row .what span {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--gray-400);
+    margin-top: 2px;
+  }
+  .modal-price-row .amount {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--navy);
+    font-family: 'Fraunces', serif;
+  }
+
+  .modal-includes {
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .modal-includes .inc-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+  .modal-includes .inc-row .tick {
+    width: 18px; height: 18px;
+    background: var(--success-bg);
+    color: var(--success);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+
+  /* PayPal button container */
+  #paypal-button-container {
+    min-height: 48px;
+    margin-bottom: 10px;
+  }
+  #paypal-loading {
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 13px;
+    padding: 12px 0;
+  }
+
+  .modal-secure {
+    text-align: center;
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 10px;
+  }
+  .modal-close-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 6px;
+  }
+  .modal-close-btn:hover { color: var(--gray-600); }
+
+  /* Success state */
+  .payment-success {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    animation: fadeIn 0.4s ease;
+  }
+  .payment-success .success-icon { font-size: 3rem; margin-bottom: 12px; }
+  .payment-success h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    color: var(--success);
+    margin-bottom: 8px;
+  }
+  .payment-success p { font-size: 13px; color: var(--gray-600); }
+
+</style>
+<script src="https://www.paypal.com/sdk/js?client-id=ARXPT6z2HjMLJU5whPayBjbr2pi85RiGT4dQM4kIV5BD9dZjvmQVaho_YXPoFFt7B1kowgY1ptcrZV54&currency=USD&intent=capture" data-sdk-integration-source="button-factory"></script>
+</head>
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <rect x="2" y="2" width="8" height="10" rx="1.5" fill="#c9a84c"/>
+      <rect x="12" y="2" width="8" height="6" rx="1.5" fill="rgba(255,255,255,0.4)"/>
+      <rect x="12" y="10" width="8" height="10" rx="1.5" fill="rgba(255,255,255,0.4)"/>
+      <rect x="2" y="14" width="8" height="6" rx="1.5" fill="rgba(255,255,255,0.25)"/>
+    </svg>
+    CV Builder <span>Pro</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button onclick="startAfresh()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:white;padding:6px 14px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.03em;" onmouseover="this.style.background='rgba(255,255,255,0.22)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">↺ Start Afresh</button>
+    <div class="header-badge">AI Powered</div>
+  </div>
+</header>
+
+<!-- STEPS BAR -->
+<nav class="steps-bar" id="stepsBar">
+  <div class="step-tab active" id="tab1">
+    <div class="step-num">1</div> Your CV
+  </div>
+  <div class="step-tab" id="tab2">
+    <div class="step-num">2</div> Job Description
+  </div>
+  <div class="step-tab" id="tab3">
+    <div class="step-num">3</div> CV Template
+  </div>
+  <div class="step-tab" id="tab4">
+    <div class="step-num">4</div> Cover Letter
+  </div>
+  <div class="step-tab" id="tab5">
+    <div class="step-num">5</div> Generate & Download
+  </div>
+</nav>
+
+<!-- GENERATING OVERLAY -->
+<div class="generating-overlay" id="genOverlay">
+  <div class="generating-box">
+    <div class="spinner"></div>
+    <h3 id="overlayTitle">Crafting your CV…</h3>
+    <p id="overlaySubtitle">Our AI is tailoring your resume to the job description.</p>
+    <div class="gen-steps" id="genSteps">
+      <div class="gen-step" id="gs1"><div class="gen-dot"></div><span id="gs1t">Parsing your experience</span></div>
+      <div class="gen-step" id="gs2"><div class="gen-dot"></div><span id="gs2t">Matching job keywords</span></div>
+      <div class="gen-step" id="gs3"><div class="gen-dot"></div><span id="gs3t">Optimising for ATS</span></div>
+      <div class="gen-step" id="gs4"><div class="gen-dot"></div><span id="gs4t">Applying template format</span></div>
+      <div class="gen-step" id="gs5"><div class="gen-dot"></div><span id="gs5t">Finalising & polishing</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- STEP 1: YOUR CV -->
+  <div class="section-panel active" id="panel1">
+    <h1 class="section-heading">📄 Add Your Current CV</h1>
+    <p class="section-sub">Upload a .docx/.txt file or paste your CV text directly below.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📤</span> Upload CV File</div>
+      <div class="upload-zone" id="cvUploadZone" onclick="document.getElementById('cvFileInput').click()">
+        <input type="file" id="cvFileInput" accept=".pdf,.docx,.doc,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain">
+        <div class="upload-icon">📄</div>
+        <p><strong>Click to upload</strong> or drag & drop</p>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">PDF</span>
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">DOCX</span>
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">DOC</span>
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">TXT</span>
+        </div>
+      </div>
+      <div id="cvFileBadge" class="hidden"></div>
+    </div>
+
+    <div class="or-divider">or paste your CV text</div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">✏️</span> Paste CV Text</div>
+      <div class="input-group">
+        <textarea id="cvText" placeholder="Paste your full CV/resume text here...&#10;&#10;Include: Contact info, work experience, education, skills, achievements..." style="min-height:220px;"></textarea>
+      </div>
+    </div>
+
+    <div id="cvError" class="alert alert-info" style="display:none;"></div>
+    <div class="actions-row">
+      <div></div>
+      <button class="btn btn-primary btn-lg" onclick="goStep(2)">Next: Job Description →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: JOB DESCRIPTION -->
+  <div class="section-panel" id="panel2">
+    <h1 class="section-heading">🎯 Add the Job Description</h1>
+    <p class="section-sub">The AI will tailor your CV to match this role's requirements and keywords.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> Upload Job Description</div>
+      <div class="upload-zone" id="jdUploadZone" onclick="document.getElementById('jdFileInput').click()">
+        <input type="file" id="jdFileInput" accept=".pdf,.docx,.doc,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain">
+        <div class="upload-icon">📋</div>
+        <p><strong>Click to upload</strong> or drag & drop</p>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;">
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">PDF</span>
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">DOCX</span>
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">DOC</span>
+          <span style="background:#e8eef9;color:#1a2744;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;">TXT</span>
+        </div>
+      </div>
+      <div id="jdFileBadge" class="hidden"></div>
+    </div>
+
+    <div class="or-divider">or paste job description</div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">✏️</span> Paste Job Description</div>
+      <div class="input-group">
+        <textarea id="jdText" placeholder="Paste the job description here...&#10;&#10;Include: Job title, responsibilities, requirements, qualifications, company info..." style="min-height:220px;"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">⚙️</span> Preferences</div>
+      <div class="grid-2">
+        <div class="input-group">
+          <label>Target Job Title <span style="font-weight:400;color:var(--success);font-size:10px;">● Auto-detected from JD</span></label>
+          <input type="text" id="targetTitle" placeholder="Auto-detected when JD is loaded…" readonly
+            style="background:var(--gray-100);cursor:default;"
+            title="Automatically extracted from the job description. Edit if needed.">
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px;">Click to edit manually if needed</div>
+        </div>
+        <div class="input-group">
+          <label>Tone</label>
+          <select id="cvTone">
+            <option value="professional">Professional & Formal</option>
+            <option value="confident">Confident & Results-Driven</option>
+            <option value="technical">Technical & Precise</option>
+            <option value="executive">Executive-Level</option>
+            <option value="creative">Creative & Dynamic</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="input-group">
+          <label>Emphasis</label>
+          <select id="cvEmphasis">
+            <option value="achievements">Achievements & Impact</option>
+            <option value="skills">Skills & Expertise</option>
+            <option value="leadership">Leadership & Management</option>
+            <option value="technical">Technical Depth</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Experience Level</label>
+          <select id="expLevel">
+            <option value="senior">Senior (10+ years)</option>
+            <option value="mid">Mid-Level (5–10 years)</option>
+            <option value="junior">Junior (1–5 years)</option>
+            <option value="executive">Executive / C-Suite</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="jdError" class="alert alert-info" style="display:none;"></div>
+    <div class="actions-row">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="goStep(3)">Next: Choose Template →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: TEMPLATE -->
+  <div class="section-panel" id="panel3">
+    <h1 class="section-heading">📄 Choose Your CV Template</h1>
+    <p class="section-sub">Pick the resume layout that fits your role. All templates are ATS-optimised. <strong>You must select one to continue.</strong></p>
+
+    <!-- Template category filter -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;">
+      <span style="font-size:12px;font-weight:600;color:var(--gray-600);">Filter:</span>
+      <button onclick="filterTpl('all')" class="tpl-filter active" data-cat="all">All Templates</button>
+      <button onclick="filterTpl('professional')" class="tpl-filter" data-cat="professional">Professional</button>
+      <button onclick="filterTpl('technical')" class="tpl-filter" data-cat="technical">Technical / ICT</button>
+      <button onclick="filterTpl('modern')" class="tpl-filter" data-cat="modern">Modern</button>
+      <button onclick="filterTpl('student')" class="tpl-filter" data-cat="student">Student / Entry</button>
+      <button onclick="filterTpl('executive')" class="tpl-filter" data-cat="executive">Executive</button>
+    </div>
+
+    <div class="template-grid" id="templateGrid">
+
+      <!-- TS1: Student Resume (Image 1) -->
+      <div class="template-card" onclick="selectTemplate('TS1','student')" id="tpl-TS1" data-cat="student">
+        <div class="template-preview" style="background:#f0f4fb;">
+          <div style="padding:6px 6px 4px;font-family:Arial;height:100%;">
+            <div style="text-align:center;border-bottom:2px solid #2e5eaa;padding-bottom:3px;margin-bottom:3px;">
+              <div style="font-size:8px;font-weight:bold;color:#222;font-family:Georgia,serif;">Your Name</div>
+              <div style="font-size:4px;color:#2e5eaa;font-style:italic;margin-top:1px;">Digital Marketing Enthusiast | Relationship-Oriented Professional</div>
+              <div style="font-size:3.5px;color:#777;margin-top:1px;">City, ST | Email Address | Phone | LinkedIn URL</div>
+            </div>
+            <div style="font-size:4.5px;font-weight:bold;color:#2e5eaa;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:1px;">Professional Summary</div>
+            <div style="width:100%;height:1px;background:#2e5eaa;margin-bottom:2px;"></div>
+            <div style="font-size:3px;color:#444;margin-bottom:3px;line-height:1.4;">Confident young professional eager to leverage education in digital marketing to support organisational growth.</div>
+            <div style="font-size:4.5px;font-weight:bold;color:#2e5eaa;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:1px;">Areas of Expertise</div>
+            <div style="width:100%;height:1px;background:#2e5eaa;margin-bottom:2px;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:3px;background:#eef2fb;padding:2px;">
+              <div style="font-size:3px;color:#333;">✓ Social Media Marketing</div><div style="font-size:3px;color:#333;">✓ Content Creation</div>
+              <div style="font-size:3px;color:#333;">✓ Email Marketing</div><div style="font-size:3px;color:#333;">✓ Data Analytics</div>
+            </div>
+            <div style="font-size:4.5px;font-weight:bold;color:#2e5eaa;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:1px;">Education</div>
+            <div style="width:100%;height:1px;background:#2e5eaa;margin-bottom:2px;"></div>
+            <div style="font-size:3.5px;font-weight:bold;color:#222;">Bachelor of Arts, Digital Marketing, North Pole University | 2022</div>
+            <div style="font-size:3px;color:#555;margin-top:1px;">• Capstone: Digital marketing strategy for local business</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Student Resume</strong>
+          <span>Graduate & Entry-Level</span>
+          <div class="template-badge badge-stu">Student</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- TT2: Technical Resume (Image 2) -->
+      <div class="template-card" onclick="selectTemplate('TT2','technical')" id="tpl-TT2" data-cat="technical">
+        <div class="template-preview" style="background:#fff;">
+          <div style="padding:5px;font-family:Arial;height:100%;">
+            <div style="text-align:center;padding-bottom:3px;margin-bottom:3px;">
+              <div style="font-size:7.5px;font-weight:900;color:#111;letter-spacing:1px;">TECHNICAL RESUME</div>
+              <div style="font-size:3px;color:#666;margin-top:1px;">(XXX) XXX–XXXX | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7513141e101b141810351018141c195b161a18">[email&#160;protected]</a> | Boston, MA</div>
+              <div style="border-bottom:2px solid #222;border-top:1px solid #222;margin:2px 0;padding:1px 0;text-align:center;">
+                <div style="font-size:3.5px;font-weight:bold;">Network Specialist • Senior IT Support • People-Focused Innovator</div>
+              </div>
+            </div>
+            <div style="font-size:4px;font-weight:bold;text-align:center;color:#333;margin-bottom:1px;">—— Technical Proficiencies ——</div>
+            <div style="border:0.5px solid #ccc;padding:1.5px 3px;margin-bottom:2px;font-size:3px;">
+              <div style="display:grid;grid-template-columns:auto 1fr;gap:0 4px;">
+                <b>Network:</b><span>Routers, Switches, Checkpoint Firewall</span>
+                <b>OS:</b><span>Windows 7/10, Apple OS X, iOS</span>
+                <b>Protocols:</b><span>TCP/IP, DNS, DHCP, VPN, LAN, WAN</span>
+              </div>
+            </div>
+            <div style="font-size:4px;font-weight:bold;text-align:center;color:#333;margin-bottom:1px;">—— Professional Experience ——</div>
+            <div style="font-size:3.5px;font-weight:bold;color:#222;">Sr. Support Lead; IT Help, Inc. | 04/2019–Present</div>
+            <div style="font-size:3px;color:#555;font-style:italic;margin-bottom:1px;">Owned support for 220+ accounts, 50-80 tickets/week.</div>
+            <div style="font-size:3px;color:#444;">• <b>SLA:</b> Maintained agreements with 70+ 24/7 clients</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Technical Resume</strong>
+          <span>ICT / Engineering / IT</span>
+          <div class="template-badge badge-tech">Technical</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- TCC: Career Change Resume (Image 3) -->
+      <div class="template-card" onclick="selectTemplate('TCC','professional')" id="tpl-TCC" data-cat="professional">
+        <div class="template-preview" style="background:#fff;">
+          <div style="padding:5px;font-family:Arial;height:100%;">
+            <div style="margin-bottom:3px;">
+              <div style="font-size:8px;font-weight:bold;color:#111;font-family:Georgia,serif;">Joe Doe</div>
+              <div style="font-size:3px;color:#777;margin-bottom:1px;">City, ST | Phone | Email | LinkedIn</div>
+              <div style="border-bottom:2px solid #222;margin-bottom:2px;"></div>
+              <div style="font-size:4px;font-weight:bold;text-align:center;">Cybersecurity Enthusiast • Tech Professional • Lifelong Learner</div>
+            </div>
+            <div style="font-size:4px;font-weight:bold;color:#333;text-transform:uppercase;border-bottom:1px solid #333;margin-bottom:2px;">Professional Summary</div>
+            <div style="font-size:3px;color:#444;margin-bottom:2px;">Adaptable professional with transferable skills transitioning into a new industry with confidence.</div>
+            <div style="font-size:4px;font-weight:bold;color:#333;text-transform:uppercase;border-bottom:1px solid #333;margin-bottom:2px;">Key Skills</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:2px;">
+              <div style="font-size:3px;">✓ Cybersecurity</div><div style="font-size:3px;">✓ Network Security</div>
+              <div style="font-size:3px;">✓ Risk Management</div><div style="font-size:3px;">✓ Python</div>
+            </div>
+            <div style="font-size:4px;font-weight:bold;color:#333;text-transform:uppercase;border-bottom:1px solid #333;margin-bottom:2px;">Professional Experience</div>
+            <div style="font-size:3.5px;font-weight:bold;">IT Analyst, ABC Company | June 2018–Present</div>
+            <div style="font-size:3px;color:#555;font-style:italic;margin-bottom:1px;">30% increase in efficiency through automation tools.</div>
+            <div style="font-size:3px;color:#444;">• Reduced security incidents by 50% via network analysis</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Career Change</strong>
+          <span>Transferable Skills Focused</span>
+          <div class="template-badge badge-pro">Professional</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- TPL_MP: Multi-Page Professional (Image 4 - template-adddd.png) -->
+      <div class="template-card" onclick="selectTemplate('MP','professional')" id="tpl-MP" data-cat="professional">
+        <div class="template-preview" style="background:#fafafa;">
+          <div style="padding:5px;font-family:Arial;height:100%;">
+            <div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:3px;">
+              <div style="flex:1;">
+                <div style="font-size:8px;font-weight:900;color:#111;font-family:Georgia,serif;">Your Name</div>
+                <div style="font-size:3.5px;color:#555;margin-top:1px;">Professional Title | Professional Title</div>
+                <div style="font-size:3px;color:#888;">Phone | City, ST | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="02676f636b6e42636666706771712c616d6f">[email&#160;protected]</a> | LinkedIn</div>
+              </div>
+            </div>
+            <div style="border-bottom:1.5px dashed #aaa;margin-bottom:3px;"></div>
+            <div style="font-size:4px;font-weight:bold;color:#333;border-bottom:0.5px solid #ddd;margin-bottom:2px;">PROFESSIONAL SUMMARY</div>
+            <div style="font-size:3px;color:#555;margin-bottom:2px;">Comprehensive professional summary spanning your expertise and key career achievements.</div>
+            <div style="font-size:4px;font-weight:bold;color:#333;border-bottom:0.5px solid #ddd;margin-bottom:2px;">AREAS OF EXPERTISE</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.5px;margin-bottom:2px;font-size:3px;">
+              <div>• Add Key Skill</div><div>• Add Key Skill</div><div>• Add Key Skill</div><div>• Add Key Skill</div>
+            </div>
+            <div style="font-size:4px;font-weight:bold;color:#333;border-bottom:0.5px solid #ddd;margin-bottom:2px;">PROFESSIONAL EXPERIENCE</div>
+            <div style="font-size:3.5px;font-weight:bold;">Job Title | Start Date – Present</div>
+            <div style="font-size:3px;font-weight:bold;color:#444;">Company Name, City, ST</div>
+            <div style="font-size:3px;color:#555;">• Two-line bullet point here with achievement</div>
+            <div style="font-size:3px;color:#555;">• Two-line bullet point here with metric</div>
+            <div style="font-size:3px;color:#888;font-style:italic;margin-top:2px;">(Continued on page 2...)</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Multi-Page Pro</strong>
+          <span>Extended Experience</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 1C: Two Column (Image 5) -->
+      <div class="template-card" onclick="selectTemplate('1C','modern')" id="tpl-1C" data-cat="modern">
+        <div class="template-preview" style="background:#f5f5f5;">
+          <div style="display:flex;gap:0;height:100%;font-family:Arial;">
+            <div style="width:30%;background:#222;padding:5px 4px;">
+              <div style="font-size:6px;font-weight:900;color:white;margin-bottom:1px;">YOUR NAME</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:4px;">TITLE HERE</div>
+              <div style="font-size:3px;color:#aaa;font-weight:bold;margin-bottom:1px;border-bottom:0.5px solid #555;padding-bottom:1px;">CONTACT</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:0.5px;">☎ XXX-XXX-XXXX</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:0.5px;">✉ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="463f29333428272b2306212b272f2a6825292b">[email&#160;protected]</a></div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:3px;">📍 City, PR</div>
+              <div style="font-size:3px;color:#aaa;font-weight:bold;margin-bottom:1px;border-bottom:0.5px solid #555;padding-bottom:1px;">EDUCATION</div>
+              <div style="font-size:3px;font-weight:bold;color:#eee;margin-bottom:0.5px;">SCHOOL NAME</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:0.5px;">Degree Earned</div>
+              <div style="font-size:3px;color:#999;font-style:italic;margin-bottom:3px;">Grad Year</div>
+              <div style="font-size:3px;color:#aaa;font-weight:bold;margin-bottom:1px;border-bottom:0.5px solid #555;padding-bottom:1px;">CAREER HIGHLIGHTS</div>
+              <div style="font-size:3px;color:#eee;font-weight:bold;">Highlight:</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:1px;">Key phrase here.</div>
+            </div>
+            <div style="flex:1;padding:5px;">
+              <div style="font-size:4.5px;font-weight:bold;color:#333;border-bottom:1px solid #ddd;margin-bottom:2px;">PROFESSIONAL SUMMARY</div>
+              <div style="font-size:3px;color:#555;margin-bottom:3px;line-height:1.4;">Six lines here. Six lines here. Six lines here. Six lines here. Six lines here. Six lines here.</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#333;border-bottom:1px solid #ddd;margin-bottom:2px;">EXPERIENCE</div>
+              <div style="font-size:3.5px;font-weight:bold;color:#222;">COMPANY NAME – City, ST</div>
+              <div style="font-size:3px;color:#777;font-style:italic;">Job Title, Start Date – End Date</div>
+              <div style="font-size:3px;color:#555;font-style:italic;margin-bottom:1px;">Two line overview here.</div>
+              <div style="font-size:3px;color:#444;">• Achievement bullet point here</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Two Column</strong>
+          <span>Dark Sidebar Layout</span>
+          <div class="template-badge badge-mod">Modern</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 2E: Gold Rule (Image 6) -->
+      <div class="template-card" onclick="selectTemplate('2E','professional')" id="tpl-2E" data-cat="professional">
+        <div class="template-preview" style="background:#fffdf5;">
+          <div style="padding:6px;font-family:Arial;height:100%;">
+            <div style="text-align:center;margin-bottom:4px;">
+              <div style="font-size:9px;font-weight:900;color:#1a1a1a;letter-spacing:0.5px;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:3.5px;color:#888;margin-top:1px;">CITY, ST | XXX.XXX.XXXX | EMAIL ADDRESS | LINKEDIN URL</div>
+              <div style="border-bottom:2px solid #c9a84c;border-top:2px solid #c9a84c;margin:2px 0;padding:1px 0;">
+                <div style="font-size:4px;font-weight:bold;color:#c9a84c;">Professional Title  |  Professional Title</div>
+              </div>
+            </div>
+            <div style="font-size:4px;font-weight:bold;color:#2e5eaa;text-transform:uppercase;border-bottom:1.5px solid #c9a84c;margin-bottom:2px;">Professional Summary</div>
+            <div style="font-size:3px;color:#555;margin-bottom:3px;">Three to four-line professional summary tailored to the job with key achievements.</div>
+            <div style="font-size:4px;font-weight:bold;color:#2e5eaa;text-transform:uppercase;border-bottom:1.5px solid #c9a84c;margin-bottom:2px;">Areas of Expertise</div>
+            <div style="font-size:3px;color:#333;margin-bottom:3px;">» Insert Key Skill Here &nbsp;&nbsp;» Insert Key Skill Here &nbsp;&nbsp;» Insert Key Skill Here</div>
+            <div style="font-size:4px;font-weight:bold;color:#2e5eaa;text-transform:uppercase;border-bottom:1.5px solid #c9a84c;margin-bottom:2px;">Career Highlights</div>
+            <div style="font-size:3px;color:#333;margin-bottom:1px;"><b style="color:#c9a84c;">Highlight:</b> Impressive accomplishment with metric here.</div>
+            <div style="font-size:3px;color:#333;margin-bottom:1px;"><b style="color:#c9a84c;">Highlight:</b> Impressive accomplishment with metric here.</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Gold Rule</strong>
+          <span>Professional with Gold Accents</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 2F: Dashed Dividers (Image 7) -->
+      <div class="template-card" onclick="selectTemplate('2F','professional')" id="tpl-2F" data-cat="professional">
+        <div class="template-preview" style="background:#fff;">
+          <div style="padding:6px;font-family:Arial;height:100%;">
+            <div style="text-align:center;margin-bottom:3px;">
+              <div style="font-size:9px;font-weight:900;color:#111;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:4px;font-weight:bold;color:#333;margin-top:1px;">Professional Title  |  Professional Title</div>
+              <div style="font-size:3px;color:#777;margin-top:1px;">Email | Phone | City, ST | LinkedIn URL</div>
+              <div style="border-bottom:2px solid #333;margin:2px 0;"></div>
+              <div style="border-bottom:1px dashed #aaa;margin:1px 0;"></div>
+            </div>
+            <div style="font-size:4.5px;font-weight:bold;color:#222;border-bottom:1px solid #ddd;margin-bottom:2px;">Professional Summary</div>
+            <div style="font-size:3px;color:#555;margin-bottom:3px;">Four-line professional summary here. Key expertise and career highlights.</div>
+            <div style="font-size:4.5px;font-weight:bold;color:#222;border-bottom:1px solid #ddd;margin-bottom:2px;">Key Skills</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:2px;font-size:3px;">
+              <div>✓ Add Key Skill Here</div><div>✓ Add Key Skill Here</div>
+              <div>✓ Add Key Skill Here</div><div>✓ Add Key Skill Here</div>
+            </div>
+            <div style="font-size:4.5px;font-weight:bold;color:#222;border-bottom:1px solid #ddd;margin-bottom:2px;">Professional Experience</div>
+            <div style="font-size:3.5px;font-weight:bold;">Job Title, Company Name, City, ST | Start – End</div>
+            <div style="font-size:3px;color:#555;font-style:italic;">Short overview of the job here.</div>
+            <div style="font-size:3px;color:#444;">• Achievement bullet point here</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Dashed Dividers</strong>
+          <span>Clean Traditional Style</span>
+          <div class="template-badge badge-pro">Professional</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 3I: Gray Banner (Image 8) -->
+      <div class="template-card" onclick="selectTemplate('3I','modern')" id="tpl-3I" data-cat="modern">
+        <div class="template-preview" style="background:#f5f5f5;">
+          <div style="height:100%;font-family:Arial;">
+            <div style="background:#d4d4d4;padding:5px 6px;text-align:center;margin-bottom:4px;">
+              <div style="font-size:8px;font-weight:900;color:#111;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:3px;color:#555;">City, NY | Phone | Email | LinkedIn</div>
+            </div>
+            <div style="padding:0 6px;">
+              <div style="text-align:center;font-size:4px;font-weight:bold;margin-bottom:3px;">Professional Title • Professional Title • Professional Title</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#222;border-bottom:1px solid #bbb;margin-bottom:2px;">Professional Summary</div>
+              <div style="font-size:3px;color:#555;margin-bottom:2px;">Three line professional summary here. Three line summary here.</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#222;border-bottom:1px solid #bbb;margin-bottom:2px;">Key Skills</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5px;margin-bottom:2px;font-size:3px;">
+                <div>✓ Something</div><div>✓ Something</div><div>✓ Something</div><div>✓ Something</div>
+              </div>
+              <div style="font-size:4.5px;font-weight:bold;color:#222;border-bottom:1px solid #bbb;margin-bottom:2px;">Professional Experience</div>
+              <div style="font-size:3.5px;font-weight:bold;">Job Title, Company, City, ST | Start – End</div>
+              <div style="font-size:3px;color:#555;font-style:italic;">Two-line overview of job here.</div>
+              <div style="font-size:3px;color:#444;">• Bullet here. Bullet here.</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Gray Banner</strong>
+          <span>Clean & Understated</span>
+          <div class="template-badge badge-mod">Modern</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 4L: Technical IT (Image 9) -->
+      <div class="template-card" onclick="selectTemplate('4L','technical')" id="tpl-4L" data-cat="technical">
+        <div class="template-preview" style="background:#fff;">
+          <div style="padding:5px;font-family:Arial;height:100%;">
+            <div style="text-align:center;margin-bottom:3px;">
+              <div style="font-size:8px;font-weight:900;color:#111;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:3px;color:#666;">(XXX) XXX-XXXX | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="94f1f9f5fdf8d4f1f9f5fdf8baf7fbf9">[email&#160;protected]</a> | City, ST</div>
+              <div style="border-bottom:2px solid #333;margin-top:2px;"></div>
+            </div>
+            <div style="background:#eee;padding:1.5px 3px;text-align:center;margin-bottom:2px;">
+              <div style="font-size:3.5px;font-style:italic;color:#444;">Headline • Headline • Headline • Headline • Headline</div>
+            </div>
+            <div style="font-size:3px;color:#555;margin-bottom:2px;">Two-line job overview here. Two-line job overview of role here.</div>
+            <div style="font-size:4.5px;font-weight:bold;color:#333;border-bottom:1px solid #333;margin-bottom:2px;text-transform:uppercase;">Technical Proficiencies</div>
+            <div style="border:0.5px solid #ccc;padding:1.5px 3px;margin-bottom:2px;font-size:3px;">
+              <div><b>Operating Systems:</b> Windows XP/10, Apple OS X</div>
+              <div><b>Server OS:</b> Windows Linux, Novell</div>
+              <div><b>Networking:</b> TCP/IP, DNS, DHCP, HTTP, VPN</div>
+            </div>
+            <div style="font-size:4.5px;font-weight:bold;color:#333;border-bottom:1px solid #333;margin-bottom:2px;text-transform:uppercase;">Professional Experience</div>
+            <div style="font-size:3.5px;font-weight:bold;">Job Title: Company Name</div>
+            <div style="font-size:3px;color:#555;">Company | City, ST–ST | Start – End</div>
+            <div style="font-size:3px;color:#444;">• SLA: Maintained agreements; resolved issues in hours</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Technical IT</strong>
+          <span>ICT Systems & Networks</span>
+          <div class="template-badge badge-tech">Technical</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- CVS1: Simple Classic (Image 10 - CV_Template_1_Simple) -->
+      <div class="template-card" onclick="selectTemplate('CVS1','professional')" id="tpl-CVS1" data-cat="professional">
+        <div class="template-preview" style="background:#fff;">
+          <div style="display:flex;height:100%;font-family:Arial;">
+            <div style="width:28%;border-right:1px solid #ddd;padding:5px 4px;">
+              <div style="font-size:7px;font-weight:900;color:#111;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:3.5px;color:#888;margin-bottom:3px;">TITLE HERE</div>
+              <div style="font-size:3.5px;font-weight:bold;color:#222;border-bottom:0.5px solid #ccc;margin-bottom:1px;text-transform:uppercase;font-size:3px;">Contact</div>
+              <div style="font-size:3px;color:#666;margin-bottom:0.5px;">☎ XXX-XXX-XXXX</div>
+              <div style="font-size:3px;color:#666;margin-bottom:0.5px;">✉ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8beee6eae2e7cbece6eae2e7a5e8e4e6">[email&#160;protected]</a></div>
+              <div style="font-size:3px;color:#666;margin-bottom:3px;">📍 City, PR</div>
+              <div style="font-size:3px;color:#333;font-weight:bold;border-bottom:0.5px solid #ccc;margin-bottom:1px;text-transform:uppercase;">Education</div>
+              <div style="font-size:3px;font-weight:bold;color:#222;margin-bottom:0.5px;">SCHOOL NAME</div>
+              <div style="font-size:3px;color:#666;margin-bottom:0.5px;">Degree Earned</div>
+              <div style="font-size:3px;color:#999;font-style:italic;margin-bottom:3px;">Grad Year</div>
+              <div style="font-size:3px;font-weight:bold;color:#333;border-bottom:0.5px solid #ccc;margin-bottom:1px;text-transform:uppercase;">Career Highlights</div>
+              <div style="font-size:3px;margin-bottom:0.5px;"><b>Highlight:</b> Key phrase here.</div>
+              <div style="font-size:3px;margin-bottom:0.5px;"><b>Highlight:</b> Key phrase here.</div>
+            </div>
+            <div style="flex:1;padding:5px;">
+              <div style="font-size:4.5px;font-weight:bold;color:#333;text-transform:uppercase;border-bottom:1px solid #ddd;margin-bottom:2px;">Professional Summary</div>
+              <div style="font-size:3px;color:#555;margin-bottom:3px;line-height:1.4;">Six lines here. Six lines here. Six lines here. Six lines here. Six lines here. Six lines here.</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#333;text-transform:uppercase;border-bottom:1px solid #ddd;margin-bottom:2px;">Experience</div>
+              <div style="font-size:4px;font-weight:bold;color:#222;">COMPANY NAME – City, ST</div>
+              <div style="font-size:3px;color:#777;font-style:italic;margin-bottom:1px;">Job Title, Start Date – End Date</div>
+              <div style="font-size:3px;color:#555;font-style:italic;margin-bottom:1px;">Two line overview here.</div>
+              <div style="font-size:3px;color:#444;">• Achievement bullet here</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Simple Classic</strong>
+          <span>Sidebar with Highlights</span>
+          <div class="template-badge badge-pro">Professional</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- CVM2: Modern Dark (Image 11 - CV_Template_2_Modern) -->
+      <div class="template-card" onclick="selectTemplate('CVM2','modern')" id="tpl-CVM2" data-cat="modern">
+        <div class="template-preview" style="background:#f0f2f8;">
+          <div style="display:flex;height:100%;font-family:Arial;">
+            <div style="width:38%;background:#1a1f3c;padding:5px 4px;">
+              <div style="font-size:7px;font-weight:900;color:white;font-family:Georgia,serif;line-height:1.1;margin-bottom:2px;">YOUR NAME</div>
+              <div style="font-size:3.5px;font-weight:bold;color:#c9a84c;margin-bottom:4px;">Professional Title</div>
+              <div style="font-size:3px;color:#aaa;margin-bottom:1px;">Phone Number</div>
+              <div style="font-size:3px;color:#aaa;margin-bottom:1px;">Current City, ST</div>
+              <div style="font-size:3px;color:#aaa;margin-bottom:1px;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bdd8d0dcd4d1fddcd9d9cfd8cece93ded2d0">[email&#160;protected]</a></div>
+              <div style="font-size:3px;color:#aaa;margin-bottom:4px;">linkedin.com/in/your-id</div>
+              <div style="font-size:3px;color:#c9a84c;font-weight:bold;border-bottom:0.5px solid #444;margin-bottom:1px;">AREAS OF EXPERTISE</div>
+              <div style="font-size:3px;color:#ddd;margin-bottom:0.5px;">» Add Key Skill Here</div>
+              <div style="font-size:3px;color:#ddd;margin-bottom:0.5px;">» Add Key Skill Here</div>
+              <div style="font-size:3px;color:#ddd;margin-bottom:3px;">» Add Key Skill Here</div>
+              <div style="font-size:3px;color:#c9a84c;font-weight:bold;border-bottom:0.5px solid #444;margin-bottom:1px;">EDUCATION</div>
+              <div style="font-size:3px;color:#eee;font-weight:bold;margin-bottom:0.5px;">Credential, Area of Study,</div>
+              <div style="font-size:3px;color:#aaa;">School Name, City, ST | YEAR</div>
+            </div>
+            <div style="flex:1;padding:5px;background:white;">
+              <div style="border-bottom:2px solid #c9a84c;padding-bottom:2px;margin-bottom:3px;">
+                <div style="font-size:4.5px;font-weight:bold;color:#1a1f3c;text-transform:uppercase;">Professional Summary</div>
+              </div>
+              <div style="font-size:3px;color:#555;margin-bottom:3px;line-height:1.4;">Insert your professional summary here with key highlights.</div>
+              <div style="border-bottom:2px solid #c9a84c;padding-bottom:2px;margin-bottom:2px;">
+                <div style="font-size:4.5px;font-weight:bold;color:#1a1f3c;text-transform:uppercase;">Professional Experience</div>
+              </div>
+              <div style="font-size:3.5px;font-weight:bold;color:#1a1f3c;">Job Title | Start Date – Present</div>
+              <div style="font-size:3px;font-weight:bold;color:#444;margin-bottom:1px;">Company Name, City, ST</div>
+              <div style="font-size:3px;color:#555;">• Two-line bullet point here with achievement</div>
+              <div style="font-size:3px;color:#555;">• Two-line bullet point here with metric</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Modern Dark</strong>
+          <span>Navy Sidebar with Gold Accents</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 1A: Blue Accent Classic -->
+      <div class="template-card" onclick="selectTemplate('1A','professional')" id="tpl-1A" data-cat="professional">
+        <div class="template-preview" style="background:#f0f4fb;">
+          <div style="font-family:Arial;height:100%;">
+            <div style="background:#2e5eaa;color:white;padding:6px 6px;margin-bottom:4px;">
+              <div style="font-size:7px;font-weight:bold;">YOUR NAME</div>
+              <div style="font-size:4px;opacity:0.9;">Title 1  |  Title 2</div>
+              <div style="font-size:3.5px;opacity:0.75;margin-top:1px;">City | Email | Phone | LinkedIn</div>
+            </div>
+            <div style="padding:0 5px;">
+              <div style="font-size:4.5px;font-weight:bold;color:#2e5eaa;border-bottom:1.5px solid #2e5eaa;margin-bottom:2px;text-transform:uppercase;">Professional Summary</div>
+              <div style="font-size:3px;color:#444;margin-bottom:3px;">Three to four lines tailored to the job with key achievements highlighted clearly.</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#2e5eaa;border-bottom:1.5px solid #2e5eaa;margin-bottom:2px;text-transform:uppercase;">Areas of Expertise</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#eef2fb;padding:2px;margin-bottom:3px;font-size:3px;">
+                <div>✓ Skill Here</div><div>✓ Skill Here</div><div>✓ Skill Here</div><div>✓ Skill Here</div>
+              </div>
+              <div style="font-size:4.5px;font-weight:bold;color:#2e5eaa;border-bottom:1.5px solid #2e5eaa;margin-bottom:2px;text-transform:uppercase;">Professional Experience</div>
+              <div style="font-size:3.5px;font-weight:bold;color:#222;">Job Title, Company Name | 2019–Present</div>
+              <div style="font-size:3px;color:#555;">● Achievement bullet one with metrics</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Blue Accent Classic</strong>
+          <span>Navy Header, Clean Layout</span>
+          <div class="template-badge badge-pro">Professional</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 1B: Navy + Gold Executive -->
+      <div class="template-card" onclick="selectTemplate('1B','executive')" id="tpl-1B" data-cat="executive">
+        <div class="template-preview" style="background:#f8f8f8;">
+          <div style="font-family:Arial;height:100%;">
+            <div style="background:#1a2744;color:white;padding:6px 7px;display:flex;justify-content:space-between;align-items:center;margin-bottom:0;">
+              <div style="font-size:7px;font-weight:bold;">YOUR NAME</div>
+              <div style="font-size:3.5px;opacity:0.8;">City | Phone | Email</div>
+            </div>
+            <div style="background:#c9a84c;padding:2.5px 6px;margin-bottom:3px;">
+              <div style="font-size:4px;color:#1a2744;font-weight:bold;font-style:italic;">Headline • Headline • Headline • Headline</div>
+            </div>
+            <div style="padding:0 5px;">
+              <div style="font-size:4.5px;font-weight:bold;color:#1a2744;margin-bottom:1px;text-transform:uppercase;">Professional Summary</div>
+              <div style="width:100%;height:1px;background:#1a2744;margin-bottom:2px;"></div>
+              <div style="font-size:3px;color:#444;margin-bottom:3px;">Executive summary with key achievements and domain expertise highlighted.</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#1a2744;margin-bottom:1px;text-transform:uppercase;">Career Highlights</div>
+              <div style="width:100%;height:1px;background:#1a2744;margin-bottom:2px;"></div>
+              <div style="font-size:3px;color:#333;margin-bottom:1px;"><b>Achievement:</b> Key impact metric and outcome</div>
+              <div style="font-size:3px;color:#333;margin-bottom:2px;"><b>Achievement:</b> Key impact metric and outcome</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#1a2744;margin-bottom:1px;text-transform:uppercase;">Experience</div>
+              <div style="width:100%;height:1px;background:#1a2744;margin-bottom:1px;"></div>
+              <div style="font-size:3.5px;font-weight:bold;">Job Title, Company | 2019–Present</div>
+              <div style="font-size:3px;color:#555;">● Bullet with result and metric</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Navy + Gold Executive</strong>
+          <span>Impact-Focused Leadership</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 3G: Navy Accent Strip -->
+      <div class="template-card" onclick="selectTemplate('3G','professional')" id="tpl-3G" data-cat="professional">
+        <div class="template-preview" style="background:#f0f4fb;">
+          <div style="display:flex;height:100%;font-family:Arial;">
+            <div style="width:10px;background:#1a2744;flex-shrink:0;"></div>
+            <div style="flex:1;padding:5px;">
+              <div style="font-size:7px;font-weight:bold;color:#1a2744;margin-bottom:1px;">Your Name</div>
+              <div style="font-size:3.5px;color:#888;margin-bottom:4px;">Professional Title • Professional Title | Phone | City | LinkedIn</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#1a2744;margin-bottom:1px;">— PROFESSIONAL SUMMARY —</div>
+              <div style="width:100%;height:1px;background:#1a2744;margin-bottom:2px;"></div>
+              <div style="font-size:3px;color:#555;margin-bottom:3px;">Three-line professional summary with key expertise areas clearly stated.</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#1a2744;margin-bottom:1px;">— PROFESSIONAL EXPERIENCE —</div>
+              <div style="width:100%;height:1px;background:#1a2744;margin-bottom:2px;"></div>
+              <div style="font-size:3.5px;font-weight:bold;color:#333;">Company | Job Title | 2019–Present</div>
+              <div style="font-size:3px;color:#555;font-style:italic;">Short overview of the role here.</div>
+              <div style="font-size:3px;color:#555;">● Achievement bullet with metric</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Navy Accent Strip</strong>
+          <span>Bold Side-Rule Design</span>
+          <div class="template-badge badge-pro">Professional</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 4J: Navy Sidebar Senior -->
+      <div class="template-card" onclick="selectTemplate('4J','executive')" id="tpl-4J" data-cat="executive">
+        <div class="template-preview" style="background:#f0f2f8;">
+          <div style="display:flex;height:100%;font-family:Arial;">
+            <div style="width:36%;background:#1a2744;padding:5px 4px;">
+              <div style="font-size:6px;font-weight:bold;color:white;margin-bottom:1px;">YOUR NAME</div>
+              <div style="font-size:3px;color:#c9a84c;margin-bottom:4px;font-weight:bold;">TITLE • TITLE</div>
+              <div style="font-size:3px;color:#aaa;font-weight:bold;border-bottom:0.5px solid #444;margin-bottom:1px;">CONTACT</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:0.5px;">☎ Phone</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:0.5px;">✉ Email</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:3px;">in LinkedIn</div>
+              <div style="font-size:3px;color:#aaa;font-weight:bold;border-bottom:0.5px solid #444;margin-bottom:1px;">EDUCATION</div>
+              <div style="font-size:3px;color:#eee;font-weight:bold;margin-bottom:0.5px;">BSc, School Name</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:3px;">City, ST | 2004</div>
+              <div style="font-size:3px;color:#aaa;font-weight:bold;border-bottom:0.5px solid #444;margin-bottom:1px;">KEY SKILLS</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:0.5px;">• Skill One</div>
+              <div style="font-size:3px;color:#ccc;margin-bottom:0.5px;">• Skill Two</div>
+            </div>
+            <div style="flex:1;padding:5px;background:white;">
+              <div style="font-size:4.5px;font-weight:bold;color:#1a2744;border-bottom:1px solid #ddd;margin-bottom:2px;text-transform:uppercase;">Professional Summary</div>
+              <div style="font-size:3px;color:#555;margin-bottom:3px;">Six-line executive summary with key impact areas highlighted.</div>
+              <div style="font-size:4.5px;font-weight:bold;color:#1a2744;border-bottom:1px solid #ddd;margin-bottom:2px;text-transform:uppercase;">Experience</div>
+              <div style="font-size:3.5px;font-weight:bold;color:#1a2744;">JOB TITLE | Start – Present</div>
+              <div style="font-size:3px;font-weight:bold;color:#666;">COMPANY NAME, City, ST</div>
+              <div style="font-size:3px;color:#555;">● Achievement metric here</div>
+            </div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Navy Sidebar</strong>
+          <span>Senior & High-Impact Roles</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- 4K: Gold Highlights Premium -->
+      <div class="template-card" onclick="selectTemplate('4K','executive')" id="tpl-4K" data-cat="executive">
+        <div class="template-preview" style="background:#fffcf2;">
+          <div style="padding:6px;font-family:Arial;height:100%;">
+            <div style="border-bottom:3px solid #c9a84c;padding-bottom:3px;margin-bottom:3px;">
+              <div style="font-size:9px;font-weight:900;color:#1a2744;letter-spacing:0.5px;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:3px;color:#888;margin-top:1px;">City | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5a3f373b33361a3b3e3e283f292974393537">[email&#160;protected]</a> | XXX-XXX-XXXX | LinkedIn</div>
+              <div style="font-size:4px;color:#c9a84c;font-weight:bold;margin-top:1px;">Professional Title  |  Professional Title</div>
+            </div>
+            <div style="font-size:4px;font-weight:bold;color:#c9a84c;text-transform:uppercase;margin-bottom:1px;">Professional Summary</div>
+            <div style="font-size:3px;color:#555;margin-bottom:2px;">Expert professional with proven outcomes and measurable impact.</div>
+            <div style="font-size:4px;font-weight:bold;color:#c9a84c;text-transform:uppercase;margin-bottom:1px;">Career Highlights</div>
+            <div style="font-size:3px;color:#555;margin-bottom:0.5px;">★ Major quantified achievement one</div>
+            <div style="font-size:3px;color:#555;margin-bottom:2px;">★ Major quantified achievement two</div>
+            <div style="background:#1a2744;color:white;padding:1.5px 4px;border-radius:2px;font-size:3.5px;margin-bottom:1px;font-weight:bold;">JOB TITLE  |  Company  |  2019–Present</div>
+            <div style="font-size:3px;color:#555;font-style:italic;margin-bottom:1px;">Short overview of the job scope.</div>
+            <div style="font-size:3px;color:#444;">● Achievement with metric</div>
+          </div>
+        </div>
+        <div class="template-label">
+          <strong>Gold Highlights</strong>
+          <span>Premium Leadership Style</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+    </div>
+
+    <div id="tplAlert" class="alert alert-info hidden" style="margin-top:1rem;">
+      <span>ℹ️</span>
+      <span>Please select a template to continue.</span>
+    </div>
+    <div class="tech-warning" id="techWarning">
+      <span>⚠️</span>
+      <div>
+        <strong>Technical template selected.</strong> This template is optimised for ICT, engineering, and technology roles.
+        Your CV and job description should be for a technical position to get the best results.
+        <a href="#" onclick="selectTemplate(null);return false;" style="color:#664d03;text-decoration:underline;margin-left:4px;">Choose a different template</a>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="goStep(4)">Next: Cover Letter →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: COVER LETTER TEMPLATE -->
+  <div class="section-panel" id="panel4">
+    <h1 class="section-heading">✉️ Choose Your Cover Letter Template</h1>
+    <p class="section-sub">Select a cover letter style. The AI will generate a personalised letter matching your CV and the job description.</p>
+
+    <div class="cl-template-grid" id="clTemplateGrid">
+
+      <!-- CL1: Bold Header Pro -->
+      <div class="cl-card" onclick="selectCLTemplate('CL1')" id="cltpl-CL1">
+        <div class="cl-preview" style="background:#f0f4fb;">
+          <div style="padding:6px;font-family:Arial;height:100%;">
+            <div style="background:#1a2744;color:white;padding:5px 8px;margin-bottom:4px;border-radius:2px;">
+              <div style="font-size:7px;font-weight:900;letter-spacing:0.5px;">YOUR NAME</div>
+              <div style="font-size:3.5px;color:#c9a84c;margin-top:1px;">PROFESSIONAL TITLE | PROFESSIONAL TITLE</div>
+              <div style="font-size:3px;color:rgba(255,255,255,0.7);margin-top:1px;">Email | Phone | City, ST | LinkedIn</div>
+            </div>
+            <div style="font-size:3px;color:#777;margin-bottom:3px;">Date &nbsp;|&nbsp; Company Name &nbsp;|&nbsp; Department</div>
+            <div style="font-size:3px;color:#333;margin-bottom:2px;">Dear Hiring Manager,</div>
+            <div style="font-size:3px;color:#555;line-height:1.5;margin-bottom:2px;">I am excited to submit my application for this position. My [X] years of experience have allowed me to develop the critical skills needed to excel in this role.</div>
+            <div style="display:grid;grid-template-columns:8px 1fr;gap:2px;margin-bottom:2px;">
+              <div style="background:#1a2744;border-radius:1px;"></div>
+              <div style="font-size:3px;color:#555;line-height:1.5;">Key achievement highlighted with metrics and impact clearly stated here.</div>
+            </div>
+            <div style="display:grid;grid-template-columns:8px 1fr;gap:2px;">
+              <div style="background:#1a2744;border-radius:1px;"></div>
+              <div style="font-size:3px;color:#555;line-height:1.5;">Second achievement highlighted with context and outcome here.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cl-label">
+          <strong>Bold Header Pro</strong>
+          <span>Navy header, gold accent</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- CL2: Executive Dual Title -->
+      <div class="cl-card" onclick="selectCLTemplate('CL2')" id="cltpl-CL2">
+        <div class="cl-preview" style="background:#fffdf5;">
+          <div style="padding:6px;font-family:Arial;height:100%;">
+            <div style="border-bottom:3px solid #c9a84c;margin-bottom:4px;padding-bottom:3px;">
+              <div style="font-size:7.5px;font-weight:900;color:#1a2744;letter-spacing:0.5px;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:3.5px;font-weight:bold;color:#c9a84c;">PROFESSIONAL TITLE | PROFESSIONAL TITLE</div>
+              <div style="font-size:3px;color:#888;margin-top:1px;">Email | Phone | City, ST | LinkedIn</div>
+            </div>
+            <div style="font-size:3px;color:#777;margin-bottom:3px;">Date &nbsp;|&nbsp; Company Name &nbsp;|&nbsp; Department</div>
+            <div style="font-size:3px;color:#333;margin-bottom:2px;">Dear Hiring Manager,</div>
+            <div style="font-size:3px;color:#555;line-height:1.5;margin-bottom:3px;">I am pleased to apply for this position. My background in [field] positions me well to contribute meaningfully to your team.</div>
+            <div style="border-left:2px solid #c9a84c;padding-left:3px;margin-bottom:2px;">
+              <div style="font-size:3px;color:#555;">Key strength and achievement with measurable result here.</div>
+            </div>
+            <div style="border-left:2px solid #c9a84c;padding-left:3px;">
+              <div style="font-size:3px;color:#555;">Second key achievement with specific impact and outcome.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cl-label">
+          <strong>Executive Dual Title</strong>
+          <span>Gold rule, premium feel</span>
+          <div class="template-badge badge-exec">Executive</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- CL3: Modern Two-Column -->
+      <div class="cl-card" onclick="selectCLTemplate('CL3')" id="cltpl-CL3">
+        <div class="cl-preview" style="background:#f5f5f5;">
+          <div style="height:100%;font-family:Arial;">
+            <div style="display:flex;border-bottom:2px solid #333;margin-bottom:4px;padding-bottom:3px;align-items:flex-end;justify-content:space-between;padding:5px 6px 3px;">
+              <div>
+                <div style="font-size:7px;font-weight:900;color:#111;font-family:Georgia,serif;">Your Name</div>
+                <div style="font-size:3.5px;color:#555;">Title</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:3px;color:#666;">Address</div>
+                <div style="font-size:3px;color:#666;">XXX-XXX-XXXX • <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a5c0c8c4ccc9e5c2c8c4ccc98bc6cac8">[email&#160;protected]</a></div>
+              </div>
+            </div>
+            <div style="padding:0 6px;">
+              <div style="font-size:3px;color:#777;margin-bottom:3px;">Date &nbsp;|&nbsp; Company Name &nbsp;|&nbsp; Dept</div>
+              <div style="font-size:3px;color:#333;margin-bottom:2px;">Dear Hiring Manager,</div>
+              <div style="font-size:3px;color:#555;line-height:1.5;margin-bottom:2px;">I am excited to apply for this role. My experience aligns closely with what you are seeking in an ideal candidate.</div>
+              <div style="background:#f0f0f0;padding:2px 3px;border-radius:2px;margin-bottom:2px;">
+                <div style="font-size:3px;color:#444;">• Achievement one with quantified result and context</div>
+                <div style="font-size:3px;color:#444;">• Achievement two with specific impact stated</div>
+              </div>
+              <div style="font-size:3px;color:#555;line-height:1.5;">I look forward to discussing how my background can contribute to your organisation's success.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cl-label">
+          <strong>Modern Two-Column</strong>
+          <span>Split header, clean lines</span>
+          <div class="template-badge badge-mod">Modern</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- CL4: Premium Bold -->
+      <div class="cl-card" onclick="selectCLTemplate('CL4')" id="cltpl-CL4">
+        <div class="cl-preview" style="background:#fff;">
+          <div style="padding:6px;font-family:Arial;height:100%;">
+            <div style="margin-bottom:4px;">
+              <div style="font-size:8px;font-weight:900;color:#111;letter-spacing:0.8px;text-transform:uppercase;font-family:Georgia,serif;">YOUR NAME</div>
+              <div style="font-size:3.5px;font-weight:bold;color:#333;text-transform:uppercase;letter-spacing:0.3px;">PROFESSIONAL TITLE | PROFESSIONAL TITLE</div>
+              <div style="font-size:3px;color:#777;margin-top:1px;">Email | Phone | City, ST | LinkedIn</div>
+              <div style="height:2px;background:#111;margin-top:2px;"></div>
+            </div>
+            <div style="font-size:3px;color:#777;margin-bottom:3px;">Date &nbsp;|&nbsp; Company Name &nbsp;|&nbsp; Department</div>
+            <div style="font-size:3px;color:#333;font-weight:bold;margin-bottom:2px;">Dear Hiring Manager,</div>
+            <div style="font-size:3px;color:#555;line-height:1.5;margin-bottom:3px;">With a strong background in [field], I bring the expertise and drive to make an immediate impact in this role at your organisation.</div>
+            <div style="border-top:1px solid #eee;padding-top:2px;">
+              <div style="font-size:3px;color:#444;margin-bottom:1px;"><b>Key Achievement:</b> Specific result with measurable outcome here.</div>
+              <div style="font-size:3px;color:#444;"><b>Key Achievement:</b> Second specific result with context and impact.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cl-label">
+          <strong>Premium Bold</strong>
+          <span>All-caps name, bold lines</span>
+          <div class="template-badge badge-pro">Professional</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+      <!-- CL5: Universal Clean -->
+      <div class="cl-card" onclick="selectCLTemplate('CL5')" id="cltpl-CL5">
+        <div class="cl-preview" style="background:#fafafa;">
+          <div style="height:100%;font-family:Arial;">
+            <div style="display:flex;border-bottom:1px solid #ddd;margin-bottom:4px;padding:5px 6px 3px;justify-content:space-between;align-items:flex-end;">
+              <div>
+                <div style="font-size:7px;font-weight:700;color:#222;font-family:Georgia,serif;">Your Name</div>
+                <div style="font-size:3.5px;color:#777;">Title</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:3px;color:#666;">Address</div>
+                <div style="font-size:3px;color:#666;">XXX-XXX-XXXX • <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f0959d91999cb0979d91999cde939f9d">[email&#160;protected]</a></div>
+              </div>
+            </div>
+            <div style="padding:0 6px;">
+              <div style="font-size:3px;color:#777;margin-bottom:3px;">Date &nbsp;|&nbsp; Company Name &nbsp;|&nbsp; Department</div>
+              <div style="font-size:3px;color:#333;margin-bottom:2px;">Dear Hiring Manager,</div>
+              <div style="font-size:3px;color:#555;line-height:1.5;margin-bottom:3px;">I am submitting my application with great enthusiasm for this position. My skills and experience make me a strong candidate for your team.</div>
+              <div style="font-size:3px;color:#555;line-height:1.5;margin-bottom:2px;">During my career, I have consistently delivered results including [specific achievement] and [specific outcome].</div>
+              <div style="font-size:3px;color:#555;line-height:1.5;">I welcome the opportunity to discuss my qualifications further. Thank you for your consideration.</div>
+            </div>
+          </div>
+        </div>
+        <div class="cl-label">
+          <strong>Universal Clean</strong>
+          <span>Simple, versatile, ATS-safe</span>
+          <div class="template-badge badge-pro">Professional</div>
+        </div>
+        <div class="template-check">✓</div>
+      </div>
+
+    </div>
+
+    <div id="clAlert" class="alert alert-info hidden" style="margin-top:1rem;">
+      <span>ℹ️</span>
+      <span>Please select a cover letter template to continue.</span>
+    </div>
+
+    <div class="actions-row">
+      <button class="btn btn-ghost" onclick="goStep(3)">← Back to CV Template</button>
+      <button class="btn btn-primary btn-lg" onclick="goStep(5)">Generate CV & Cover Letter →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: GENERATE & RESULTS -->
+  <div class="section-panel" id="panel5">
+
+    <!-- PAGE TITLE -->
+    <div style="text-align:center;margin-bottom:2rem;padding:1.5rem;background:linear-gradient(135deg,var(--navy) 0%,#253460 100%);border-radius:var(--radius);color:white;">
+      <div style="font-size:1.8rem;margin-bottom:4px;">✨</div>
+      <h1 style="font-family:'Fraunces',serif;font-size:1.6rem;font-weight:500;color:white;margin-bottom:6px;">Your Documents Are Ready</h1>
+      <p style="font-size:14px;color:rgba(255,255,255,0.75);">Preview your AI-generated documents below — unlock to download all formats.</p>
+    </div>
+
+    <!-- ATS SCORE BADGES -->
+    <div class="score-row" id="scoreRow">
+      <div class="score-badge" id="badge-ats">
+        <div class="score-ring">
+          <svg viewBox="0 0 72 72" width="72" height="72">
+            <circle class="ring-bg" cx="36" cy="36" r="28"/>
+            <circle class="ring-fill" id="ring-ats" cx="36" cy="36" r="28"/>
+          </svg>
+          <div class="ring-val" id="atsScore">—</div>
+        </div>
+        <div class="lbl">ATS Score</div>
+      </div>
+      <div class="score-badge" id="badge-kw">
+        <div class="score-ring">
+          <svg viewBox="0 0 72 72" width="72" height="72">
+            <circle class="ring-bg" cx="36" cy="36" r="28"/>
+            <circle class="ring-fill" id="ring-kw" cx="36" cy="36" r="28"/>
+          </svg>
+          <div class="ring-val" id="keywordScore">—</div>
+        </div>
+        <div class="lbl">Keyword Match</div>
+      </div>
+      <div class="score-badge" id="badge-read">
+        <div class="score-ring">
+          <svg viewBox="0 0 72 72" width="72" height="72">
+            <circle class="ring-bg" cx="36" cy="36" r="28"/>
+            <circle class="ring-fill" id="ring-read" cx="36" cy="36" r="28"/>
+          </svg>
+          <div class="ring-val" id="readScore">—</div>
+        </div>
+        <div class="lbl">Readability</div>
+      </div>
+      <div class="score-badge" id="badge-match">
+        <div class="score-ring">
+          <svg viewBox="0 0 72 72" width="72" height="72">
+            <circle class="ring-bg" cx="36" cy="36" r="28"/>
+            <circle class="ring-fill" id="ring-match" cx="36" cy="36" r="28"/>
+          </svg>
+          <div class="ring-val" id="matchScore">—</div>
+        </div>
+        <div class="lbl">Role Alignment</div>
+      </div>
+    </div>
+
+    <!-- KEYWORD TAGS -->
+    <div class="card" id="keywordCard" style="display:none;margin-bottom:1.25rem;">
+      <div class="card-title"><span class="icon">🔑</span> Matched Keywords</div>
+      <div id="keywordTags"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SECTION 1: RESUME / CV                         -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div style="background:var(--navy);color:white;padding:12px 20px;border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;gap:10px;margin-top:0.5rem;">
+      <span style="font-size:1.3rem;">📄</span>
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;">Resume / CV</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.65);">Your tailored, ATS-optimised resume</div>
+      </div>
+    </div>
+    <div style="border:2px solid var(--navy);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:1.25rem;margin-bottom:2rem;background:var(--white);">
+      <div class="result-cols">
+        <!-- CV Text Output -->
+        <div class="result-output">
+          <div class="result-header">
+            Generated CV Text
+            <button class="btn btn-ghost" id="copyBtn" onclick="copyCVText()" style="padding:4px 12px;font-size:12px;">📋 Copy</button>
+          </div>
+          <div class="blur-wrap">
+            <div class="cv-text-output preview-blur" id="cvOutput">Your generated CV will appear here after clicking Generate…</div>
+            <div class="unlock-overlay hidden" id="cvUnlockOverlay">
+              <div class="lock-icon">🔒</div>
+              <h3>Preview Only</h3>
+              <p>Your tailored CV is ready. Unlock to download in Word, PDF or Text.</p>
+              <div class="price-badge">$5.99</div>
+              <button class="btn-unlock" onclick="openPaymentModal()">
+                <span>🔓</span> Unlock All Downloads
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CV Right Column -->
+        <div>
+          <!-- ATS Tips -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-title"><span class="icon">💡</span> ATS Optimisation Tips</div>
+            <div class="ats-tips" id="atsTips">
+              <div class="tip-item"><span class="tip-icon">⏳</span><span>Generate your CV to see personalised tips…</span></div>
+            </div>
+          </div>
+
+          <!-- CV Downloads -->
+          <div style="background:var(--gray-100);border-radius:var(--radius);padding:1.25rem;border:1px solid var(--gray-200);">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+              <span>📥</span> Download CV As
+            </div>
+            <div style="font-size:11px;color:var(--gray-400);margin-bottom:10px;display:flex;align-items:center;gap:4px;">
+              🔒 <span id="cvDlStatus">Unlock to enable downloads</span>
+            </div>
+            <!-- Primary formats row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+              <button class="btn btn-primary dl-locked" id="downloadDocxBtn" onclick="guardedDownload(downloadDocx)" style="flex-direction:column;padding:10px 8px;font-size:12px;gap:2px;">
+                <span style="font-size:18px;">📝</span>Word
+              </button>
+              <button class="btn btn-gold dl-locked" id="downloadPdfBtn" onclick="guardedDownload(downloadPdf)" style="flex-direction:column;padding:10px 8px;font-size:12px;gap:2px;">
+                <span style="font-size:18px;">📕</span>PDF
+              </button>
+              <button class="btn btn-outline dl-locked" id="downloadTxtBtn" onclick="guardedDownload(downloadTxt)" style="flex-direction:column;padding:10px 8px;font-size:12px;gap:2px;">
+                <span style="font-size:18px;">📄</span>Text
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- SECTION 2: COVER LETTER                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div style="background:#2d5a3d;color:white;padding:12px 20px;border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.3rem;">✉️</span>
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;">Cover Letter</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.65);">Personalised letter tailored to this role and company</div>
+      </div>
+    </div>
+    <div style="border:2px solid #2d5a3d;border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:1.25rem;margin-bottom:2rem;background:var(--white);">
+      <div class="result-cols">
+        <!-- CL Text Output -->
+        <div class="result-output">
+          <div class="result-header" style="border-top-color:#2d5a3d;">
+            Generated Cover Letter
+            <button class="btn btn-ghost" id="copyCLBtn" onclick="copyCLText()" style="padding:4px 12px;font-size:12px;">📋 Copy</button>
+          </div>
+          <div class="blur-wrap">
+            <div class="cv-text-output preview-blur" id="clOutput">Your generated cover letter will appear here after clicking Generate…</div>
+            <div class="unlock-overlay hidden" id="clUnlockOverlay">
+              <div class="lock-icon">🔒</div>
+              <h3>Preview Only</h3>
+              <p>Your cover letter is ready. Unlock both documents for one payment.</p>
+              <div class="price-badge">$5.99</div>
+              <button class="btn-unlock" onclick="openPaymentModal()">
+                <span>🔓</span> Unlock All Downloads
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CL Right Column -->
+        <div>
+          <!-- CL Downloads -->
+          <div style="background:#f0f7f3;border-radius:var(--radius);padding:1.25rem;border:1px solid #a8d5b5;margin-bottom:1rem;">
+            <div style="font-size:12px;font-weight:700;color:#2d5a3d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+              <span>📥</span> Download Cover Letter As
+            </div>
+            <div style="font-size:11px;color:#5a8a6a;margin-bottom:10px;display:flex;align-items:center;gap:4px;">
+              🔒 <span id="clDlStatus">Unlock to enable downloads</span>
+            </div>
+            <!-- Primary formats row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+              <button class="btn btn-primary dl-locked" id="clDocxBtn" onclick="guardedDownload(downloadCLDocx)" style="flex-direction:column;padding:10px 8px;font-size:12px;gap:2px;background:#2d5a3d;border-color:#2d5a3d;">
+                <span style="font-size:18px;">📝</span>Word
+              </button>
+              <button class="btn btn-gold dl-locked" id="clPdfBtn" onclick="guardedDownload(downloadCLPdf)" style="flex-direction:column;padding:10px 8px;font-size:12px;gap:2px;">
+                <span style="font-size:18px;">📕</span>PDF
+              </button>
+              <button class="btn btn-outline dl-locked" id="clTxtBtn" onclick="guardedDownload(downloadCLTxt)" style="flex-direction:column;padding:10px 8px;font-size:12px;gap:2px;border-color:#2d5a3d;color:#2d5a3d;">
+                <span style="font-size:18px;">📄</span>Text
+              </button>
+            </div>
+          </div>
+
+          <!-- Tip card for CL -->
+          <div class="card">
+            <div class="card-title"><span class="icon">💡</span> Cover Letter Tips</div>
+            <div id="clTips" style="font-size:13px;line-height:1.7;">
+              <div class="tip-item"><span class="tip-icon">🎯</span><span>Open with a specific hook — mention the company or role by name in your first sentence.</span></div>
+              <div class="tip-item"><span class="tip-icon">📊</span><span>Include 2–3 achievement bullets with metrics directly relevant to the job requirements.</span></div>
+              <div class="tip-item"><span class="tip-icon">✅</span><span>Keep it to one page. Hiring managers spend 30 seconds on a cover letter.</span></div>
+              <div class="tip-item"><span class="tip-icon">💡</span><span>Close with a clear, confident call to action — invite them to discuss further.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- REGENERATE / NAVIGATION                        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="card">
+      <div class="card-title"><span class="icon">🔄</span> Options</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        <button class="btn btn-primary" onclick="generateBoth()">↺ Regenerate Both</button>
+        <button class="btn btn-ghost" onclick="goStep(3)">Change CV Template</button>
+        <button class="btn btn-ghost" onclick="goStep(4)">Change Cover Letter Template</button>
+        <button class="btn btn-ghost" onclick="goStep(2)">Edit Preferences</button>
+        <button class="btn btn-ghost" onclick="goStep(1)">Edit CV Data</button>
+      </div>
+    </div>
+
+  </div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PAYMENT MODAL                                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="modal-backdrop hidden" id="paymentModal" onclick="closeModalOnBackdrop(event)">
+  <div class="modal-box">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-icon">🔓</div>
+      <h2>Unlock Your Documents</h2>
+      <p>One payment · Both documents · All formats</p>
+    </div>
+
+    <!-- Body — default (pre-payment) -->
+    <div class="modal-body" id="modalBodyDefault">
+
+      <!-- Price row -->
+      <div class="modal-price-row">
+        <div class="what">
+          CV + Cover Letter Bundle
+          <span>Word · PDF · Text — all 6 downloads</span>
+        </div>
+        <div class="amount">$5.99</div>
+      </div>
+
+      <!-- What's included -->
+      <div class="modal-includes">
+        <div class="inc-row"><div class="tick">✓</div> ATS-optimised Resume / CV</div>
+        <div class="inc-row"><div class="tick">✓</div> Personalised Cover Letter</div>
+        <div class="inc-row"><div class="tick">✓</div> Word (.docx) — editable in Microsoft Word</div>
+        <div class="inc-row"><div class="tick">✓</div> PDF — print-ready A4 layout</div>
+        <div class="inc-row"><div class="tick">✓</div> Text (.txt) — paste anywhere</div>
+        <div class="inc-row"><div class="tick">✓</div> Instant download after payment</div>
+      </div>
+
+      <!-- PayPal button renders here -->
+      <div id="paypal-button-container">
+        <div id="paypal-loading">⏳ Loading secure payment…</div>
+      </div>
+
+      <div class="modal-secure">
+        🔒 Secured by PayPal · No account required · Card or PayPal balance
+      </div>
+      <button class="modal-close-btn" onclick="closePaymentModal()">✕ Cancel</button>
+    </div>
+
+    <!-- Body — success state -->
+    <div class="modal-body hidden" id="modalBodySuccess">
+      <div class="payment-success">
+        <div class="success-icon">🎉</div>
+        <h3>Payment Successful!</h3>
+        <p>Thank you! Your documents are now unlocked.<br>All download buttons are enabled below.</p>
+        <button class="btn btn-primary" style="margin-top:1.2rem;" onclick="closePaymentModal()">
+          ⬇ Download My Documents
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<script>
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+let currentStep      = 1;
+let selectedTemplate = null;   // CV template
+let selectedCLTemplate = null; // Cover letter template
+let generatedCV  = '';
+let generatedCL  = '';
+let cvRawText    = '';
+let jdRawText    = '';
+
+// ════════════════════════════════════════════
+//  PAYWALL STATE
+// ════════════════════════════════════════════
+let paymentUnlocked = false;  // becomes true after verified PayPal payment
+let paypalRendered  = false;  // ensure PayPal buttons render only once
+
+// ════════════════════════════════════════════
+//  GUARDED DOWNLOAD — intercepts all DL clicks
+// ════════════════════════════════════════════
+function guardedDownload(fn) {
+  if (!generatedCV && !generatedCL) {
+    alert('Please generate your documents first.');
+    return;
+  }
+  if (!paymentUnlocked) {
+    openPaymentModal();
+    return;
+  }
+  fn();
+}
+
+// ════════════════════════════════════════════
+//  MODAL OPEN / CLOSE
+// ════════════════════════════════════════════
+function openPaymentModal() {
+  if (!generatedCV && !generatedCL) {
+    alert('Generate your CV and cover letter first.');
+    return;
+  }
+  document.getElementById('paymentModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  // Render PayPal buttons once
+  if (!paypalRendered) {
+    renderPayPalButtons();
+    paypalRendered = true;
+  }
+}
+
+function closePaymentModal() {
+  document.getElementById('paymentModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnBackdrop(e) {
+  if (e.target === document.getElementById('paymentModal')) closePaymentModal();
+}
+
+// ════════════════════════════════════════════
+//  PAYPAL BUTTON RENDERER
+// ════════════════════════════════════════════
+function renderPayPalButtons() {
+  const container = document.getElementById('paypal-button-container');
+  const loading   = document.getElementById('paypal-loading');
+
+  if (!window.paypal) {
+    loading.textContent = '⚠ PayPal SDK not loaded. Check your internet connection.';
+    return;
+  }
+
+  loading.style.display = 'none';
+
+  paypal.Buttons({
+    style: {
+      layout: 'vertical',
+      color:  'gold',
+      shape:  'rect',
+      label:  'pay',
+      height: 48,
+    },
+
+    // ── Step 1: create order via Netlify function ──────────────────────────
+    createOrder: async function() {
+      try {
+        const res = await fetch('/.netlify/functions/create-paypal-order', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ amount: '5.99', description: 'CV Builder Pro — CV + Cover Letter Bundle' }),
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error(data.error || 'Could not create order');
+        return data.orderID;
+      } catch(err) {
+        alert('Payment setup failed: ' + err.message);
+        throw err;
+      }
+    },
+
+    // ── Step 2: capture + verify via Netlify function ──────────────────────
+    onApprove: async function(data) {
+      const loadingEl = document.getElementById('paypal-loading');
+      loadingEl.style.display = 'block';
+      loadingEl.textContent   = '⏳ Verifying payment…';
+
+      try {
+        const res = await fetch('/.netlify/functions/capture-paypal-order', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ orderID: data.orderID }),
+        });
+        const result = await res.json();
+
+        if (!res.ok || result.error) throw new Error(result.error || 'Capture failed');
+        if (result.status !== 'COMPLETED') throw new Error('Payment not completed: ' + result.status);
+
+        // ✅ Payment verified server-side — unlock everything
+        unlockDocuments();
+
+      } catch(err) {
+        loadingEl.textContent = '⚠ Verification failed: ' + err.message + '. Contact support.';
+        console.error('Capture error:', err);
+      }
+    },
+
+    onError: function(err) {
+      console.error('PayPal error:', err);
+      alert('Payment error. Please try again or use a different payment method.');
+    },
+
+    onCancel: function() {
+      // User closed PayPal — nothing to do
+    },
+
+  }).render('#paypal-button-container');
+}
+
+// ════════════════════════════════════════════
+//  UNLOCK — called after verified payment
+// ════════════════════════════════════════════
+function unlockDocuments() {
+  paymentUnlocked = true;
+
+  // Show success panel in modal
+  document.getElementById('modalBodyDefault').classList.add('hidden');
+  document.getElementById('modalBodySuccess').classList.remove('hidden');
+
+  // Remove blur from both previews
+  const cvOut = document.getElementById('cvOutput');
+  const clOut = document.getElementById('clOutput');
+  cvOut.classList.remove('preview-blur');
+  clOut.classList.remove('preview-blur');
+  cvOut.classList.add('unlocked');
+  clOut.classList.add('unlocked');
+
+  // Hide the unlock overlays
+  document.getElementById('cvUnlockOverlay').classList.add('hidden');
+  document.getElementById('clUnlockOverlay').classList.add('hidden');
+
+  // Remove dl-locked from all buttons and make them fully clickable
+  document.querySelectorAll('.dl-locked').forEach(btn => {
+    btn.classList.remove('dl-locked');
+    btn.disabled = false;
+  });
+
+  // Update status text
+  const cvStatus = document.getElementById('cvDlStatus');
+  const clStatus = document.getElementById('clDlStatus');
+  if (cvStatus) { cvStatus.textContent = 'Payment verified — downloads enabled'; cvStatus.parentElement.querySelector('span:first-child').textContent = '✅'; }
+  if (clStatus) { clStatus.textContent = 'Payment verified — downloads enabled'; clStatus.parentElement.querySelector('span:first-child').textContent = '✅'; }
+
+  // Auto-close modal after 3 seconds
+  setTimeout(closePaymentModal, 3000);
+}
+
+// ════════════════════════════════════════════
+//  SHOW OVERLAYS after generation completes
+// ════════════════════════════════════════════
+function showUnlockOverlays() {
+  if (paymentUnlocked) return;  // already paid — don't re-blur
+  document.getElementById('cvUnlockOverlay').classList.remove('hidden');
+  document.getElementById('clUnlockOverlay').classList.remove('hidden');
+  // Ensure blur is applied
+  document.getElementById('cvOutput').classList.add('preview-blur');
+  document.getElementById('clOutput').classList.add('preview-blur');
+}
+
+// ════════════════════════════════════════════
+//  STEP NAVIGATION  (now 5 steps)
+// ════════════════════════════════════════════
+function goStep(n) {
+  if (n === 2 && currentStep === 1) {
+    cvRawText = document.getElementById('cvText').value.trim();
+    if (!cvRawText) { showStepError('cvError','Please upload or paste your CV before continuing.'); return; }
+    hideStepError('cvError');
+  }
+  if (n === 3) {
+    cvRawText = document.getElementById('cvText').value.trim();
+    jdRawText = document.getElementById('jdText').value.trim();
+    if (!cvRawText) { alert('Your CV is missing. Go back to Step 1.'); setStep(1); return; }
+    if (!jdRawText) { showStepError('jdError','Please upload or paste a job description before continuing.'); return; }
+    hideStepError('jdError');
+    autoExtractJobTitle(jdRawText);
+  }
+  if (n === 4) {
+    if (!selectedTemplate) {
+      document.getElementById('tplAlert').classList.remove('hidden');
+      return;
+    }
+    document.getElementById('tplAlert').classList.add('hidden');
+  }
+  if (n === 5) {
+    if (!selectedCLTemplate) {
+      document.getElementById('clAlert').classList.remove('hidden');
+      return;
+    }
+    document.getElementById('clAlert').classList.add('hidden');
+    setStep(5);
+    generateBoth();
+    return;
+  }
+  setStep(n);
+}
+
+function setStep(n) {
+  currentStep = n;
+  const totalPanels = 5;
+  document.querySelectorAll('.section-panel').forEach((p, i) => p.classList.toggle('active', i + 1 === n));
+  document.querySelectorAll('.step-tab').forEach((t, i) => {
+    t.classList.remove('active','done');
+    if (i + 1 === n) t.classList.add('active');
+    else if (i + 1 < n) t.classList.add('done');
+  });
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function showStepError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'flex';
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function hideStepError(id) { const el=document.getElementById(id); if(el) el.style.display='none'; }
+
+// ════════════════════════════════════════════
+//  RESULT TABS
+// ════════════════════════════════════════════
+function switchResultTab(tab) { /* no-op: sections are now always visible */ }
+
+// ════════════════════════════════════════════
+//  AUTO-EXTRACT JOB TITLE FROM JD
+// ════════════════════════════════════════════
+function autoExtractJobTitle(jdText) {
+  const field = document.getElementById('targetTitle');
+  if (!jdText || (field.value.trim() && !field.dataset.autoSet)) return;
+  const labelMatch = jdText.match(/^(?:job\s*title|position|role|vacancy|post|job)\s*[:\-]\s*(.+)/im);
+  if (labelMatch) {
+    const val = labelMatch[1].trim().replace(/\s+/g,' ').replace(/[^\w\s,\/\-\(\)&]/g,'').slice(0,80);
+    if (val.length > 2) { setAutoTitle(field, val); return; }
+  }
+  const lines = jdText.split('\n').map(l=>l.trim()).filter(l=>l.length>3&&l.length<80);
+  for (const line of lines.slice(0,15)) {
+    if (/^(dear|to:|from:|date:|ref:|re:|company|about us|overview|we are|our client)/i.test(line)) continue;
+    if (line.includes('.') && line.split('.').length > 2) continue;
+    if (/^\d/.test(line)) continue;
+    const isTitleCase = line === line.replace(/\b\w/g, c=>c.toUpperCase()) || line === line.toUpperCase();
+    const hasTitleWords = /\b(manager|director|officer|analyst|engineer|specialist|coordinator|administrator|lead|head|executive|consultant|developer|architect|supervisor|advisor|technician|operator)\b/i.test(line);
+    if (isTitleCase && hasTitleWords) {
+      const clean = line.replace(/[^\w\s,\/\-\(\)&]/g,'').trim();
+      if (clean.length > 3) { setAutoTitle(field, clean); return; }
+    }
+  }
+  const firstMeaningful = lines.find(l => l.length > 4 && l.length < 60 && !/[@\d{3}]/.test(l));
+  if (firstMeaningful) {
+    const clean = firstMeaningful.replace(/[^\w\s,\/\-\(\)&]/g,'').trim();
+    if (clean.length > 3) setAutoTitle(field, clean);
+  }
+}
+
+function setAutoTitle(field, value) {
+  field.value = value;
+  field.dataset.autoSet = '1';
+  field.style.background = 'var(--success-bg)';
+  field.style.color = 'var(--success)';
+  field.removeAttribute('readonly');
+  field.style.cursor = '';
+  setTimeout(() => { field.style.background=''; field.style.color=''; }, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const f = document.getElementById('targetTitle');
+  if (f) f.addEventListener('input', () => { delete f.dataset.autoSet; });
+  const jdArea = document.getElementById('jdText');
+  if (jdArea) jdArea.addEventListener('input', () => {
+    const jd = jdArea.value.trim();
+    if (jd.length > 50) autoExtractJobTitle(jd);
+  });
+});
+
+// ════════════════════════════════════════════
+//  TEMPLATE SELECTION
+// ════════════════════════════════════════════
+function selectTemplate(id, category) {
+  selectedTemplate = id;
+  document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
+  if (id) document.getElementById('tpl-' + id).classList.add('selected');
+  document.getElementById('tplAlert').classList.add('hidden');
+  const isTech = ['TT2','4L'].includes(id);
+  const warn = document.getElementById('techWarning');
+  if (warn) warn.classList.toggle('visible', isTech);
+}
+
+function selectCLTemplate(id) {
+  selectedCLTemplate = id;
+  document.querySelectorAll('.cl-card').forEach(c=>c.classList.remove('selected'));
+  if (id) document.getElementById('cltpl-' + id).classList.add('selected');
+  document.getElementById('clAlert').classList.add('hidden');
+}
+
+function filterTpl(cat) {
+  document.querySelectorAll('.tpl-filter').forEach(b => b.classList.toggle('active', b.dataset.cat===cat));
+  document.querySelectorAll('.template-card').forEach(card => {
+    card.style.display = (cat==='all' || card.dataset.cat===cat) ? '' : 'none';
+  });
+}
+
+// ════════════════════════════════════════════
+//  START AFRESH
+// ════════════════════════════════════════════
+function startAfresh() {
+  if (!confirm('Start over? All inputs and generated content will be cleared.')) return;
+  ['cvText','jdText'].forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.style.borderColor='';} });
+  ['cvFileBadge','jdFileBadge'].forEach(id => { const el=document.getElementById(id); if(el){el.innerHTML='';el.classList.add('hidden');} });
+  const tf=document.getElementById('targetTitle');
+  if(tf){tf.value='';tf.style.background='';tf.style.color='';tf.setAttribute('readonly','');delete tf.dataset.autoSet;}
+  generatedCV=''; generatedCL=''; cvRawText=''; jdRawText='';
+  selectedTemplate=null; selectedCLTemplate=null;
+  document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.cl-card').forEach(c=>c.classList.remove('selected'));
+  ['atsScore','keywordScore','readScore','matchScore'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent='—';el.className='ring-val';}});
+  ['ring-ats','ring-kw','ring-read','ring-match'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.strokeDashoffset='175.9';el.className='ring-fill';}});
+  ['badge-ats','badge-kw','badge-read','badge-match'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='score-badge';});
+  const out=document.getElementById('cvOutput'); if(out) out.textContent='Your generated CV will appear here...';
+  const clOut=document.getElementById('clOutput'); if(clOut) clOut.textContent='Your generated cover letter will appear here...';
+  const kc=document.getElementById('keywordCard'); if(kc) kc.style.display='none';
+  const tips=document.getElementById('atsTips'); if(tips) tips.innerHTML='<div class="tip-item"><span class="tip-icon">⏳</span><span>Generate your CV to see personalised tips...</span></div>';
+  const tw=document.getElementById('techWarning'); if(tw) tw.classList.remove('visible');
+  ['downloadDocxBtn','downloadPdfBtn','downloadTxtBtn','downloadGdocsBtn','downloadPagesBtn',
+   'clDocxBtn','clPdfBtn','clTxtBtn','clGdocsBtn','clPagesBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=true;});
+  setStep(1);
+}
+
+// ════════════════════════════════════════════
+//  LIBRARY LOADING
+// ════════════════════════════════════════════
+let mammothLoaded=false, pdfjsLoaded=false;
+
+function loadMammoth() {
+  return new Promise((res,rej)=>{
+    if(mammothLoaded){res();return;}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+    s.onload=()=>{mammothLoaded=true;res();}; s.onerror=()=>rej(new Error('Failed to load mammoth.js'));
+    document.head.appendChild(s);
+  });
+}
+
+function loadPdfJs() {
+  return new Promise((res,rej)=>{
+    if(pdfjsLoaded){res();return;}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';pdfjsLoaded=true;res();};
+    s.onerror=()=>rej(new Error('Failed to load pdf.js'));
+    document.head.appendChild(s);
+  });
+}
+
+// ════════════════════════════════════════════
+//  FILE UPLOAD HANDLER
+// ════════════════════════════════════════════
+function setupFileUpload(zoneId, inputId, badgeId, textareaId) {
+  const zone=document.getElementById(zoneId), input=document.getElementById(inputId);
+  const badge=document.getElementById(badgeId), textarea=document.getElementById(textareaId);
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)handleFile(f,badge,textarea);});
+  input.addEventListener('change',()=>{if(input.files[0])handleFile(input.files[0],badge,textarea);});
+}
+
+async function handleFile(file,badge,textarea) {
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(!['pdf','docx','doc','txt'].includes(ext)){
+    badge.innerHTML=`<div class="file-badge" style="background:var(--danger-bg);color:var(--danger);">❌ Unsupported file. Use PDF, DOCX, DOC or TXT.</div>`;
+    badge.classList.remove('hidden');return;
+  }
+  badge.innerHTML=`<div class="file-badge" style="background:#e8eef9;color:#1a2744;">⏳ Reading ${file.name}…</div>`;
+  badge.classList.remove('hidden');
+  try {
+    let text='';
+    if(ext==='txt') text=await readAsText(file);
+    else if(ext==='docx'||ext==='doc'){await loadMammoth();const buf=await readAsArrayBuffer(file);const res=await mammoth.extractRawText({arrayBuffer:buf});text=res.value;}
+    else if(ext==='pdf'){await loadPdfJs();const buf=await readAsArrayBuffer(file);const pdf=await pdfjsLib.getDocument({data:buf}).promise;const pages=[];for(let p=1;p<=pdf.numPages;p++){const page=await pdf.getPage(p);const ct=await page.getTextContent();pages.push(ct.items.map(i=>i.str).join(' '));}text=pages.join('\n\n');}
+    text=text.trim();
+    if(!text){badge.innerHTML=`<div class="file-badge" style="background:var(--danger-bg);color:var(--danger);">⚠️ No text found. Paste manually.</div>`;return;}
+    textarea.value=text;
+    textarea.style.borderColor='var(--success)';
+    setTimeout(()=>{textarea.style.borderColor='';},2000);
+    badge.innerHTML=`<div class="file-badge">✅ ${file.name} — ${text.split(/\s+/).length.toLocaleString()} words extracted</div>`;
+    if(textarea.id==='jdText') autoExtractJobTitle(text);
+  } catch(err){
+    badge.innerHTML=`<div class="file-badge" style="background:var(--danger-bg);color:var(--danger);">❌ ${err.message} — paste manually.</div>`;
+  }
+}
+function readAsText(f){return new Promise((r,j)=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.onerror=()=>j(new Error('Read failed'));rd.readAsText(f);});}
+function readAsArrayBuffer(f){return new Promise((r,j)=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.onerror=()=>j(new Error('Read failed'));rd.readAsArrayBuffer(f);});}
+
+setupFileUpload('cvUploadZone','cvFileInput','cvFileBadge','cvText');
+setupFileUpload('jdUploadZone','jdFileInput','jdFileBadge','jdText');
+
+// ════════════════════════════════════════════
+//  GENERATING OVERLAY
+// ════════════════════════════════════════════
+function showGenOverlay(isCL) {
+  document.getElementById('genOverlay').classList.add('active');
+  const steps=['gs1','gs2','gs3','gs4','gs5'];
+  steps.forEach(id=>document.getElementById(id).classList.remove('done','active'));
+  if(isCL) {
+    document.getElementById('overlayTitle').textContent='Crafting your Cover Letter…';
+    document.getElementById('overlaySubtitle').textContent='AI is writing a personalised letter for this role.';
+    const labels=['Analysing your background','Matching tone to role','Writing opening paragraph','Crafting achievement highlights','Polishing & finalising'];
+    steps.forEach((id,i)=>{const sp=document.getElementById(id+'t');if(sp)sp.textContent=labels[i];});
+  } else {
+    document.getElementById('overlayTitle').textContent='Crafting your CV…';
+    document.getElementById('overlaySubtitle').textContent='Our AI is tailoring your resume to the job description.';
+    const labels=['Parsing your experience','Matching job keywords','Optimising for ATS','Applying template format','Finalising & polishing'];
+    steps.forEach((id,i)=>{const sp=document.getElementById(id+'t');if(sp)sp.textContent=labels[i];});
+  }
+  let i=0;
+  function next(){
+    if(i>0)document.getElementById(steps[i-1]).classList.replace('active','done');
+    if(i<steps.length){document.getElementById(steps[i]).classList.add('active');i++;setTimeout(next,900+Math.random()*600);}
+  }
+  next();
+}
+function hideGenOverlay(){document.getElementById('genOverlay').classList.remove('active');}
+
+// ════════════════════════════════════════════
+//  TEMPLATE NAMES
+// ════════════════════════════════════════════
+const templateNames = {
+  'TS1' :'Student / Graduate Resume',
+  'TT2' :'Technical Resume (ICT/Engineering)',
+  'TCC' :'Career Change Resume',
+  'MP'  :'Multi-Page Professional',
+  '1C'  :'Two Column Dark Sidebar',
+  '2E'  :'Gold Rule with Blue Headings',
+  '2F'  :'Dashed Dividers',
+  '3I'  :'Gray Banner',
+  '4L'  :'Technical IT Proficiencies',
+  'CVS1':'Simple Classic Sidebar',
+  'CVM2':'Modern Dark Navy Sidebar',
+  '1A'  :'Blue Accent Classic',
+  '1B'  :'Navy + Gold Executive',
+  '3G'  :'Navy Accent Strip',
+  '4J'  :'Navy Sidebar Senior',
+  '4K'  :'Gold Highlights Premium',
+};
+
+const clTemplateNames = {
+  'CL1':'Bold Header Pro',
+  'CL2':'Executive Dual Title',
+  'CL3':'Modern Two-Column',
+  'CL4':'Premium Bold',
+  'CL5':'Universal Clean',
+};
+
+// ════════════════════════════════════════════
+//  API HELPER WITH RETRY
+// ════════════════════════════════════════════
+// ════════════════════════════════════════════
+//  API PROXY  — routes through Netlify Function so the key stays server-side
+//  In development (file:// or localhost) it falls back to direct Anthropic.
+// ════════════════════════════════════════════
+const PROXY_URL  = '/api/generate';                         // Netlify proxy
+const DIRECT_URL = 'https://api.anthropic.com/v1/messages'; // local dev fallback
+
+function getAPIEndpoint() {
+  // Use the proxy when served from a real domain (Netlify or any web server)
+  const proto = window.location.protocol;
+  const host  = window.location.hostname;
+  const isDev = proto === 'file:' || host === 'localhost' || host === '127.0.0.1';
+  return isDev ? DIRECT_URL : PROXY_URL;
+}
+
+async function callAPI(payload, retries=3, delayMs=2500) {
+  const endpoint = getAPIEndpoint();
+  let lastErr;
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    let res;
+    try {
+      // When hitting the proxy we only need Content-Type.
+      // When hitting Anthropic directly (local dev) the key must be in the header —
+      // replace 'YOUR_KEY_HERE' with your key for local testing only.
+      const headers = { 'Content-Type': 'application/json' };
+      if (endpoint === DIRECT_URL) {
+        headers['x-api-key']         = 'YOUR_KEY_HERE';
+        headers['anthropic-version'] = '2023-06-01';
+      }
+
+      res = await fetch(endpoint, {
+        method:  'POST',
+        headers,
+        body:    JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        const msg         = data.error.message || data.error.type || 'API error';
+        const isTransient = res.status === 529 || res.status === 429 ||
+                            msg.toLowerCase().includes('overload');
+        if (isTransient && attempt < retries) {
+          await sleep(delayMs * Math.pow(1.8, attempt - 1));
+          continue;
+        }
+        throw new Error(msg);
+      }
+
+      return data;
+
+    } catch (err) {
+      lastErr = err;
+      if (attempt < retries) { await sleep(delayMs * attempt); continue; }
+    }
+  }
+
+  throw lastErr || new Error('Request failed after all retries.');
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ════════════════════════════════════════════
+//  GENERATE BOTH CV + COVER LETTER
+// ════════════════════════════════════════════
+async function generateBoth() {
+  const cvText=document.getElementById('cvText').value.trim();
+  const jdText=document.getElementById('jdText').value.trim();
+  const targetTitle=document.getElementById('targetTitle').value.trim();
+  const tone=document.getElementById('cvTone').value;
+  const emphasis=document.getElementById('cvEmphasis').value;
+  const expLevel=document.getElementById('expLevel').value;
+  const tplName=templateNames[selectedTemplate]||selectedTemplate;
+  const clTplName=clTemplateNames[selectedCLTemplate]||selectedCLTemplate;
+
+  // Reset
+  ['downloadDocxBtn','downloadPdfBtn','downloadTxtBtn','downloadGdocsBtn','downloadPagesBtn',
+   'clDocxBtn','clPdfBtn','clTxtBtn','clGdocsBtn','clPagesBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=true;});
+  document.getElementById('cvOutput').textContent='';
+  document.getElementById('clOutput').textContent='';
+  document.getElementById('keywordCard').style.display='none';
+
+  // ── STEP A: Generate CV ──
+  showGenOverlay(false);
+
+  const cvSystemPrompt = `You are an elite CV writer with 20+ years helping senior professionals secure their dream roles. You write compelling, human, achievement-driven CVs that pass ATS systems and impress hiring managers.
+
+CORE RULES:
+- Use ONLY real information from the candidate's CV. Never fabricate employers, dates, or qualifications.
+- Every bullet under PROFESSIONAL EXPERIENCE: Strong action verb + specific task + concrete result with metric.
+- Sound natural and confident. No clichés: "results-driven", "dynamic", "passionate", "team player".
+- Quantify achievements wherever possible.
+- Mirror exact keywords from the job description naturally.
+- Job title on CV must match the target role from the JD.
+
+RESPONSE FORMAT — output exactly two sections:
+
+=== CV OUTPUT ===
+[Full Name]
+[Target Job Title] | [Secondary Title]
+[City, Country] | [Email] | [Phone] | [LinkedIn]
+
+PROFESSIONAL SUMMARY
+[3–4 tight sentences tailored to the job]
+
+CAREER HIGHLIGHTS
+• [Quantified win 1]
+• [Quantified win 2]
+• [Quantified win 3]
+
+AREAS OF EXPERTISE
+[Skill 1] | [Skill 2] | [Skill 3] | [Skill 4] | [Skill 5] | [Skill 6] | [Skill 7] | [Skill 8]
+
+PROFESSIONAL EXPERIENCE
+
+[Job Title] | [Company] | [City] | [Start] – [End]
+[1 sentence scope context]
+• [Achievement: verb + task + metric]
+• [Achievement: verb + task + metric]
+• [Achievement: verb + task + metric]
+
+EDUCATION
+[Degree], [Institution], [Year]
+
+CERTIFICATIONS & TRAINING
+[Certification], [Body], [Year]
+
+TECHNICAL SKILLS
+[Category]: [Skill 1], [Skill 2]
+
+===ANALYSIS===
+ATS_SCORE: [60-99]
+KEYWORD_SCORE: [60-99]%
+READ_SCORE: [A+/A/A-/B+/B/B-/C+/C]
+MATCH_SCORE: [60-99]%
+KEYWORDS: [12 comma-separated keywords from both CV and JD]
+TIP1: 🎯 [specific tip]
+TIP2: 📊 [specific tip]
+TIP3: 🔑 [specific tip]
+TIP4: ✅ [specific tip]
+TIP5: 💡 [specific tip]`;
+
+  const cvUserPrompt = `Write a complete ATS-optimised CV:
+TARGET ROLE: ${targetTitle||'Extract from JD'}
+TONE: ${tone} | EMPHASIS: ${emphasis} | LEVEL: ${expLevel} | TEMPLATE: ${tplName}
+
+=== CANDIDATE CV ===
+${cvText}
+
+=== JOB DESCRIPTION ===
+${jdText}
+
+Every bullet must be achievement-led. Write the CV then the ===ANALYSIS=== block.`;
+
+  try {
+    const cvData = await callAPI({model:'claude-sonnet-4-20250514',max_tokens:4500,system:cvSystemPrompt,messages:[{role:'user',content:cvUserPrompt}]});
+    const fullCVText=(cvData.content?.[0]?.text||'').trim();
+    if(!fullCVText) throw new Error('Empty response. Please try again.');
+
+    const patterns=['===ANALYSIS===','=== ANALYSIS ===','---ANALYSIS---'];
+    let cvPart='', analysisPart='';
+    let splitIdx=-1, splitLen=0;
+    for(const pat of patterns){const idx=fullCVText.indexOf(pat);if(idx!==-1){splitIdx=idx;splitLen=pat.length;break;}}
+    if(splitIdx!==-1){cvPart=fullCVText.slice(0,splitIdx).trim();analysisPart=fullCVText.slice(splitIdx+splitLen).trim();}
+    else{cvPart=fullCVText;analysisPart='';}
+    cvPart=cvPart.replace(/^={3,}\s*CV\s*OUTPUT\s*={3,}\s*/i,'').trim();
+    generatedCV=cvPart;
+
+    // Parse analysis
+    const getField=(key)=>{const m=analysisPart.match(new RegExp('^\\s*'+key+'\\s*[:\\-]\\s*(.+?)\\s*$','m'));return m?m[1].trim():null;};
+    const parseNum=(s)=>{const n=parseInt((s||'').replace(/[^0-9]/g,''));return isNaN(n)?null:n;};
+    const computeFallback=()=>{
+      const cvLow=generatedCV.toLowerCase();const jdLow=jdText.toLowerCase();
+      const jdWords=jdLow.match(/\b[a-z]{4,}\b/g)||[];
+      const stops=new Set(['with','that','this','have','from','they','your','will','been','were','their','which','about','into','more','also','when','then','than','some','such','each']);
+      const jdUniq=[...new Set(jdWords)].filter(w=>!stops.has(w));
+      const matched=jdUniq.filter(w=>cvLow.includes(w));
+      const kwPct=jdUniq.length?Math.round(matched.length/jdUniq.length*100):72;
+      const bullets=(generatedCV.match(/^[•●]/gm)||[]).length;
+      const hasQuant=/\d+\s*%|\d+[xX]|\d+\s*(years|projects|team|staff|users|mill|thou)/i.test(generatedCV);
+      const stdSec=/PROFESSIONAL SUMMARY|CAREER HIGHLIGHTS|PROFESSIONAL EXPERIENCE/i.test(generatedCV);
+      const ats=Math.min(97,Math.max(60,60+(stdSec?12:0)+(hasQuant?10:0)+(bullets>5?8:0)+Math.round(kwPct*0.08)));
+      const match=Math.min(97,Math.max(60,Math.round(kwPct*0.82+16)));
+      const read=ats>=89?'A':ats>=83?'A-':ats>=77?'B+':ats>=71?'B':'B-';
+      const topKw=matched.slice(0,12).map(w=>w[0].toUpperCase()+w.slice(1));
+      return{ats,kw:kwPct,read,match,keywords:topKw};
+    };
+    let atsNum=parseNum(getField('ATS_SCORE')),kwNum=parseNum(getField('KEYWORD_SCORE'));
+    let readRaw=getField('READ_SCORE'),matchNum=parseNum(getField('MATCH_SCORE'));
+    let kwLine=getField('KEYWORDS')||'';
+    const fb=computeFallback();
+    if(!atsNum)atsNum=fb.ats;if(!kwNum)kwNum=fb.kw;if(!readRaw)readRaw=fb.read;if(!matchNum)matchNum=fb.match;
+    if(!kwLine&&fb.keywords.length)kwLine=fb.keywords.join(', ');
+    atsNum=Math.min(99,Math.max(55,atsNum));kwNum=Math.min(99,Math.max(55,kwNum));matchNum=Math.min(99,Math.max(55,matchNum));
+    const gradeMap={'A+':98,'A':93,'A-':88,'B+':83,'B':78,'B-':72,'C+':66,'C':60};
+    const readNum=gradeMap[(readRaw||'').trim().toUpperCase()]||75;
+    const colorCls=n=>n>=85?'green':n>=70?'gold':'red';
+    const CIRC=2*Math.PI*28;
+    const animateRing=(ringId,badgeId,valId,pct,label)=>{
+      const fill=document.getElementById(ringId),badge=document.getElementById(badgeId),valEl=document.getElementById(valId);
+      if(!fill||!badge||!valEl)return;
+      const cls=colorCls(pct);
+      fill.style.strokeDashoffset=CIRC;fill.className='ring-fill';badge.className='score-badge';valEl.className='ring-val';valEl.textContent='…';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        fill.classList.add('ring-'+cls);fill.style.strokeDashoffset=CIRC-(pct/100)*CIRC;
+        badge.classList.add('clr-'+cls);valEl.classList.add('val-'+cls);valEl.textContent=label;
+      }));
+    };
+    setTimeout(()=>animateRing('ring-ats','badge-ats','atsScore',atsNum,atsNum),100);
+    setTimeout(()=>animateRing('ring-kw','badge-kw','keywordScore',kwNum,kwNum+'%'),320);
+    setTimeout(()=>animateRing('ring-read','badge-read','readScore',readNum,readRaw),540);
+    setTimeout(()=>animateRing('ring-match','badge-match','matchScore',matchNum,matchNum+'%'),760);
+    if(kwLine){
+      const kws=kwLine.split(',').map(k=>k.trim()).filter(k=>k.length>2);
+      if(kws.length){document.getElementById('keywordTags').innerHTML=kws.map(k=>`<span class="key-tag">${k}</span>`).join(' ');document.getElementById('keywordCard').style.display='block';}
+    }
+    const tips=[];for(let i=1;i<=5;i++){const t=getField('TIP'+i);if(t)tips.push(t);}
+    if(tips.length<3){['🎯 Mirror the exact job title in your Professional Summary for stronger ATS matching.','📊 Quantify more achievements — add numbers, percentages, or headcount to every bullet.','🔑 Add a dedicated Technical Skills section with keywords from the job description.','✅ Use standard section headings for ATS compatibility.','💡 Avoid tables and text boxes in Word — ATS parsers often skip them.'].forEach(t=>{if(!tips.includes(t))tips.push(t);});}
+    document.getElementById('atsTips').innerHTML=tips.slice(0,5).map(t=>{const em=t.match(/^(\p{Emoji}[\ufe0f\u20e3]?)\s*/u);const icon=em?em[1]:'✅';const body=em?t.slice(em[0].length):t;return`<div class="tip-item"><span class="tip-icon">${icon}</span><span>${body}</span></div>`;}).join('');
+    document.getElementById('cvOutput').textContent=generatedCV;
+    ['downloadDocxBtn','downloadPdfBtn','downloadTxtBtn','downloadGdocsBtn','downloadPagesBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false;});
+
+  } catch(err) {
+    hideGenOverlay();
+    document.getElementById('cvOutput').innerHTML=`<div style="color:var(--danger);padding:1rem 0;line-height:1.8"><strong>⚠️ CV generation failed</strong><br><br>${err.message}<br><br><button class="btn btn-primary" onclick="generateBoth()">↺ Try Again</button></div>`;
+    return;
+  }
+
+  // ── STEP B: Generate Cover Letter ──
+  showGenOverlay(true);
+
+  const clSystemPrompt = `You are an expert cover letter writer. You write compelling, personalised cover letters that feel human, confident, and authentic — not generic.
+
+RULES:
+- Use ONLY real information from the candidate's CV. Never fabricate facts.
+- The letter must be tailored specifically to the company and role.
+- Open with a strong, specific hook — not "I am writing to apply for..."
+- Include 2–3 specific achievement bullets from the CV that directly relate to the JD requirements.
+- Close with a confident, professional call to action.
+- Tone should match the requested style.
+- Length: 3–4 paragraphs plus achievement list. Professional, concise, impactful.
+- Template style: ${clTplName}
+
+RESPONSE FORMAT — output the complete cover letter only, no preamble:
+
+=== COVER LETTER ===
+[Full Name]
+[Job Title] | [Second Title if applicable]
+[Email] | [Phone] | [City, Country] | [LinkedIn]
+
+[Today's Date]
+
+[Company Name]
+[Department]
+[Company Address]
+
+Dear [Hiring Manager / specific name if known],
+
+[Opening paragraph — strong hook, state role, immediate value proposition]
+
+[Main paragraph — your most relevant experience and 2–3 achievement bullets]
+• [Specific achievement with metric directly relevant to JD requirement]
+• [Second specific achievement with metric and context]
+• [Third specific achievement showing leadership or technical depth]
+
+[Closing paragraph — enthusiasm for the specific company, call to action]
+
+Sincerely,
+[Full Name]`;
+
+  const clUserPrompt = `Write a personalised cover letter:
+TARGET ROLE: ${targetTitle||'Extract from JD'}
+TONE: ${tone} | TEMPLATE STYLE: ${clTplName}
+
+=== CANDIDATE CV ===
+${cvText}
+
+=== JOB DESCRIPTION ===
+${jdText}
+
+Write a complete, human, achievement-led cover letter. Use real facts from the CV only.`;
+
+  try {
+    const clData = await callAPI({model:'claude-sonnet-4-20250514',max_tokens:2000,system:clSystemPrompt,messages:[{role:'user',content:clUserPrompt}]});
+    let clText=(clData.content?.[0]?.text||'').trim();
+    clText=clText.replace(/^={3,}\s*COVER\s*LETTER\s*={3,}\s*/i,'').trim();
+    generatedCL=clText;
+    hideGenOverlay();
+    document.getElementById('clOutput').textContent=generatedCL;
+    ['clDocxBtn','clPdfBtn','clTxtBtn','clGdocsBtn','clPagesBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=false;});
+    showUnlockOverlays();
+    // Both sections are always visible - scroll to CL section
+    setTimeout(()=>{ const el=document.getElementById("clOutput"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },800);
+  } catch(err) {
+    hideGenOverlay();
+    document.getElementById('clOutput').innerHTML=`<div style="color:var(--danger);padding:1rem 0;line-height:1.8"><strong>⚠️ Cover letter generation failed</strong><br><br>${err.message}<br><br><button class="btn btn-primary" onclick="generateBoth()">↺ Try Again</button></div>`;
+  }
+}
+
+// ════════════════════════════════════════════
+//  COPY TEXT
+// ════════════════════════════════════════════
+function copyCVText() {
+  if(!generatedCV)return;
+  const copy=()=>{const ta=document.createElement('textarea');ta.value=generatedCV;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(generatedCV).catch(copy);else copy();
+  const btn=document.getElementById('copyBtn');const orig=btn.textContent;btn.textContent='✓ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},2200);
+}
+function copyCLText() {
+  if(!generatedCL)return;
+  const copy=()=>{const ta=document.createElement('textarea');ta.value=generatedCL;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(generatedCL).catch(copy);else copy();
+  const btn=document.getElementById('copyCLBtn');const orig=btn.textContent;btn.textContent='✓ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},2200);
+}
+
+// Alias for backward compat
+function generateCV() { generateBoth(); }
+
+// ════════════════════════════════════════════
+//  CORE DOWNLOAD ENGINE
+// ════════════════════════════════════════════
+
+// Blob → base64 data URL (works inside all iframes / sandboxes)
+function blobToDataURL(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result);
+    r.onerror = () => rej(new Error('FileReader error'));
+    r.readAsDataURL(blob);
+  });
+}
+
+// Fire a real click event that bypasses sandbox restrictions
+function fireAnchorClick(a) {
+  a.dispatchEvent(new MouseEvent('click', {
+    bubbles: true, cancelable: true, view: window
+  }));
+}
+
+// Master download — 3-tier fallback
+async function triggerDownload(blob, filename) {
+  // Tier 1: ObjectURL (standard browsers)
+  try {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.style.display = 'none';
+    document.body.appendChild(a);
+    fireAnchorClick(a);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 15000);
+    return true;
+  } catch(e) { console.warn('[DL] Tier1 failed:', e.message); }
+
+  // Tier 2: base64 data URL anchor click
+  try {
+    const dataUrl = await blobToDataURL(blob);
+    const a = document.createElement('a');
+    a.href = dataUrl; a.download = filename; a.style.display = 'none';
+    document.body.appendChild(a);
+    fireAnchorClick(a);
+    document.body.removeChild(a);
+    return true;
+  } catch(e) { console.warn('[DL] Tier2 failed:', e.message); }
+
+  // Tier 3: Open new tab with manual save link
+  try {
+    const dataUrl = await blobToDataURL(blob);
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.write(
+        '<html><body style="font-family:sans-serif;padding:2rem;line-height:2">'
+        + '<h2>Your file is ready</h2>'
+        + '<p><a href="' + dataUrl + '" download="' + filename + '" '
+        + 'style="background:#1a2744;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">'
+        + '⬇ Click to save ' + filename + '</a></p>'
+        + '<p style="color:#666;font-size:13px;">If the button above doesn\'t work, right-click it and choose "Save link as…"</p>'
+        + '<\/body><\/html>'
+      );
+      return true;
+    }
+  } catch(e) { console.warn('[DL] Tier3 failed:', e.message); }
+
+  alert('Could not download automatically.\n\nUse the Copy button and paste into Word or a text editor.');
+  return false;
+}
+
+// Set button to loading state; return restore function
+function btnLoading(id, loadText) {
+  const btn = document.getElementById(id);
+  if (!btn) return () => {};
+  const orig = { text: btn.innerHTML, disabled: btn.disabled };
+  btn.disabled = true;
+  btn.innerHTML = '<span style="font-size:14px;">⏳</span><span>' + loadText + '</span>';
+  return (successText) => {
+    if (successText) {
+      btn.innerHTML = '<span style="font-size:16px;">✅</span><span>' + successText + '</span>';
+      setTimeout(() => { btn.innerHTML = orig.text; btn.disabled = false; }, 2800);
+    } else {
+      btn.innerHTML = orig.text; btn.disabled = false;
+    }
+  };
+}
+
+// Load external library with CDN fallbacks + global poll
+function loadScript(urls, globalName, maxWait = 10000) {
+  return new Promise((resolve, reject) => {
+    if (globalName && window[globalName]) { resolve(); return; }
+
+    const poll = (start) => {
+      if (window[globalName]) { resolve(); return; }
+      if (Date.now() - start > maxWait) { reject(new Error("'" + globalName + "' not available after " + maxWait + "ms")); return; }
+      setTimeout(() => poll(start), 150);
+    };
+
+    let idx = 0;
+    const tryNext = () => {
+      if (idx >= urls.length) { reject(new Error('All CDN sources failed')); return; }
+      const url = urls[idx++];
+      if (document.querySelector('script[src="' + url + '"]')) {
+        poll(Date.now()); return;
+      }
+      const s = document.createElement('script');
+      s.src = url;
+      s.onload = () => { if (!globalName) resolve(); else poll(Date.now()); };
+      s.onerror = () => { console.warn('[CDN] Failed:', url); tryNext(); };
+      document.head.appendChild(s);
+    };
+    tryNext();
+  });
+}
+
+// ════════════════════════════════════════════
+//  LINE CLASSIFIER — shared by PDF + DOCX builders
+// ════════════════════════════════════════════
+const SECTION_RE = /^(professional summary|career highlights|areas of expertise|key skills|expertise|professional experience|work experience|experience|education|certifications?|awards?|training|technical (proficiencies|skills)|skills|languages|references)/i;
+const BULLET_CHARS = ['•','●','★','–','—'];
+const isBullet = l => BULLET_CHARS.some(c => l.startsWith(c));
+const isSection = l => SECTION_RE.test(l.replace(/^[-—\s•●]+|[-—\s]+$/g,'').trim()) && l.length < 90;
+const isJobTitle = l => /\d{4}/.test(l) && (l.includes('|') || l.includes('–') || l.includes('—')) && l.length < 140;
+const isSkillRow = l => l.includes('|') && !/\d{4}/.test(l) && l.length < 260;
+const isContact = (l, li) => li <= 5 && (l.includes('|') || /[@+]/.test(l) || /\d{5,}/.test(l) || /linkedin/i.test(l));
+const isDegree = l => /\b(BSc|MSc|MBA|PhD|B\.A|M\.A|Bachelor|Master|Diploma|Certificate|HND|LLB|BEng|MEng)\b/i.test(l);
+const isSalutation = l => /^(dear|sincerely|yours|kind regards|regards|best regards|to whom)/i.test(l);
+
+// Get accent colour array for PDF from template id
+function getAccentRGB(tpl) {
+  if (['2E','4K'].includes(tpl))                          return [201,168,76];
+  if (['TT2','4L'].includes(tpl))                         return [45,106,79];
+  if (['2F','3I','TCC','TS1','MP','CVS1'].includes(tpl))  return [51,51,51];
+  return [26,39,68];
+}
+// Get accent hex for DOCX from template id
+function getAccentHex(tpl) {
+  if (['2E','4K'].includes(tpl))                          return 'C9A84C';
+  if (['TT2','4L'].includes(tpl))                         return '2D6A4F';
+  if (['2F','3I','TCC','TS1','MP','CVS1'].includes(tpl))  return '333333';
+  return '1A2744';
+}
+
+// ════════════════════════════════════════════
+//  PDF BUILDER — professional A4 layout
+// ════════════════════════════════════════════
+//  PDF BUILDER  — professional A4 layout
+// ════════════════════════════════════════════
+async function buildPDF(text, accentRGB, isCoverLetter) {
+  await loadScript([
+    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+    'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'
+  ], 'jspdf');
+  const jsPDFLib = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if (!jsPDFLib) throw new Error('jsPDF failed to load.');
+
+  const [R, G, B] = accentRGB;
+  const doc = new jsPDFLib({ unit:'mm', format:'a4', compress:true });
+  const PW = doc.internal.pageSize.getWidth();    // 210 mm
+  const PH = doc.internal.pageSize.getHeight();   // 297 mm
+  const ML = 20, MR = 20, CW = PW - ML - MR;     // 170 mm content width
+
+  // ── Tinted section-heading background (light tint of accent) ──
+  const tintR = Math.min(255, R + Math.round((255-R)*0.86));
+  const tintG = Math.min(255, G + Math.round((255-G)*0.86));
+  const tintB = Math.min(255, B + Math.round((255-B)*0.86));
+
+  // ── Page management ──────────────────────────────────────────
+  let y = 0;   // set after header is drawn
+  const addPage = (need) => {
+    if (y + need > PH - 18) {
+      doc.addPage();
+      // Thin rule at top of continuation pages
+      doc.setDrawColor(R, G, B);
+      doc.setLineWidth(0.4);
+      doc.line(ML, 12, PW - MR, 12);
+      y = 18;
+    }
+  };
+
+  // ── Font helper ──────────────────────────────────────────────
+  const sf = (style, size, cr, cg, cb) => {
+    doc.setFont('helvetica', style);
+    doc.setFontSize(size);
+    doc.setTextColor(cr, cg, cb);
+  };
+
+  // ── Pass 1: separate header lines from body ──────────────────
+  const allRaw = text.split('\n');
+  let nameText = '';
+  const contactLines = [];
+  let bodyIdx = 1; // index into allRaw where body starts
+
+  for (let i = 0; i < allRaw.length; i++) {
+    const l = allRaw[i].trim();
+    if (!l) continue;
+    if (i === 0 || (nameText === '' && i === 0)) { nameText = l; continue; }
+    // Up to 3 contact lines after name
+    if (contactLines.length < 3 && (l.includes('|') || /[@]/.test(l) || /linkedin/i.test(l) || /\d{6,}/.test(l))) {
+      contactLines.push(l);
+      bodyIdx = i + 1;
+    } else {
+      bodyIdx = i;
+      break;
+    }
+  }
+
+  // ── Draw page header ─────────────────────────────────────────
+  // Solid accent bar — full page width
+  doc.setFillColor(R, G, B);
+  doc.rect(0, 0, PW, 20, 'F');
+
+  // Name — white, bold, uppercase
+  sf('bold', 21, 255, 255, 255);
+  const nameLines = doc.splitTextToSize(nameText.toUpperCase(), CW);
+  doc.text(nameLines, PW / 2, nameLines.length === 1 ? 12 : 9, { align:'center' });
+
+  // Contact strip — cream background
+  const headerBottom = 20;
+  if (contactLines.length > 0) {
+    doc.setFillColor(248, 247, 243);
+    doc.rect(0, headerBottom, PW, 8, 'F');
+    // Thin accent border bottom of strip
+    doc.setDrawColor(R, G, B);
+    doc.setLineWidth(0.25);
+    doc.line(0, headerBottom + 8, PW, headerBottom + 8);
+    sf('normal', 8, 80, 80, 80);
+    const contactStr = contactLines.join('   |   ');
+    const cLines = doc.splitTextToSize(contactStr, CW);
+    doc.text(cLines, PW / 2, headerBottom + 5, { align:'center' });
+    y = headerBottom + 8 + 7;
+  } else {
+    y = headerBottom + 7;
+  }
+
+  // ── Draw body ────────────────────────────────────────────────
+  const bodyRaw = allRaw.slice(bodyIdx);
+
+  for (const raw of bodyRaw) {
+    const l = raw.trim();
+    if (!l) { y += 3; continue; }
+
+    // ─ Section heading ─────────────────────────────────
+    if (isSection(l)) {
+      addPage(18);
+      y += 4;
+      const clean = l.replace(/^[-—\s•●]+|[-—\s]+$/g,'').trim().toUpperCase();
+      // Tinted background pill
+      doc.setFillColor(tintR, tintG, tintB);
+      doc.roundedRect(ML, y - 4.5, CW, 7, 1, 1, 'F');
+      sf('bold', 9.5, R, G, B);
+      doc.text(clean, ML + 3, y);
+      y += 2.5;
+      doc.setDrawColor(R, G, B);
+      doc.setLineWidth(0.45);
+      doc.line(ML, y, PW - MR, y);
+      y += 5;
+      continue;
+    }
+
+    // ─ Bullet ─────────────────────────────────────────
+    if (isBullet(l)) {
+      addPage(11);
+      const bt = l.replace(/^[•●★–—]\s*/,'').trim();
+      sf('normal', 9.5, 44, 44, 44);
+      const bw = doc.splitTextToSize(bt, CW - 7);
+      doc.setFillColor(R, G, B);
+      doc.circle(ML + 2.2, y - 1.3, 0.9, 'F');
+      doc.text(bw, ML + 6, y);
+      y += bw.length * 5.3 + 1.8;
+      continue;
+    }
+
+    // ─ Salutation / sign-off (CL only) ────────────────
+    if (isCoverLetter && isSalutation(l)) {
+      addPage(11);
+      y += 3;
+      sf('bold', 10, R, G, B);
+      const bw = doc.splitTextToSize(l, CW);
+      doc.text(bw, ML, y);
+      y += bw.length * 5.5 + 3;
+      continue;
+    }
+
+    // ─ Job title line (has year) ───────────────────────
+    if (isJobTitle(l)) {
+      addPage(12);
+      y += 4;
+      sf('bold', 10, R, G, B);
+      const bw = doc.splitTextToSize(l.replace(/\*/g,'').trim(), CW);
+      doc.text(bw, ML, y);
+      y += bw.length * 5.5 + 0.5;
+      continue;
+    }
+
+    // ─ Skills pipe row ─────────────────────────────────
+    if (isSkillRow(l)) {
+      addPage(9);
+      const skills = l.split('|').map(s => s.trim()).filter(Boolean).join('   ·   ');
+      sf('normal', 9.5, 55, 55, 55);
+      const bw = doc.splitTextToSize(skills, CW);
+      doc.text(bw, ML, y);
+      y += bw.length * 5.1 + 2;
+      continue;
+    }
+
+    // ─ Degree / credential ─────────────────────────────
+    if (isDegree(l)) {
+      addPage(9);
+      sf('bold', 9.5, 44, 44, 44);
+      const bw = doc.splitTextToSize(l, CW);
+      doc.text(bw, ML, y);
+      y += bw.length * 5.1 + 1;
+      continue;
+    }
+
+    // ─ Role overview / italic context ─────────────────
+    if (!isCoverLetter && l.length < 200 &&
+        /^(Led|Provided|Served|Responsible|Managed|Oversaw|Supported|Coordinated|Directed|Owned|Reported|Analysed|Developed|Implemented|Delivered)/i.test(l)) {
+      addPage(9);
+      sf('italic', 9.5, 90, 90, 90);
+      const bw = doc.splitTextToSize(l, CW);
+      doc.text(bw, ML, y);
+      y += bw.length * 5.1 + 1.5;
+      continue;
+    }
+
+    // ─ Default body ────────────────────────────────────
+    addPage(9);
+    sf('normal', 9.5, 55, 55, 55);
+    const bw = doc.splitTextToSize(l, CW);
+    doc.text(bw, ML, y);
+    y += bw.length * 5.2 + 2;
+  }
+
+  // ── Footer on every page ─────────────────────────────────────
+  const total = doc.internal.getNumberOfPages();
+  const docLabel = isCoverLetter ? 'Cover Letter' : 'CV / Resume';
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p);
+    doc.setDrawColor(R, G, B);
+    doc.setLineWidth(0.3);
+    doc.line(ML, PH - 12, PW - MR, PH - 12);
+    sf('normal', 7, 160, 160, 160);
+    doc.text(docLabel + '  ·  CV Builder Pro', ML, PH - 7);
+    doc.text('Page ' + p + ' of ' + total, PW - MR, PH - 7, { align:'right' });
+  }
+
+  return doc.output('blob');
+}
+
+// ════════════════════════════════════════════
+//  DOCX BUILDER  — tested against docx@7.8.2
+// ════════════════════════════════════════════
+async function buildDOCX(text, accentHex, refName, isCoverLetter) {
+  await loadScript([
+    'https://unpkg.com/docx@7.8.2/build/index.js',
+    'https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js'
+  ], 'docx');
+  if (!window.docx) throw new Error('docx library failed to load.');
+
+  // Only destructure what actually exists in 7.8.2
+  const { Document, Packer, Paragraph, TextRun,
+          AlignmentType, BorderStyle, LevelFormat } = window.docx;
+
+  const ACC    = accentHex;          // hex string without #  e.g. '1A2744'
+  const PW     = 12240;              // page width  DXA (8.5 in)
+  const PH     = 15840;              // page height DXA (11 in)
+  const MARGIN = 1080;               // margins DXA (0.75 in)
+
+  // ── Spacing shorthand ────────────────────────────────────────
+  const sp = (b, a) => ({ before: b, after: a });
+
+  // ── Paragraph builders ───────────────────────────────────────
+
+  // NAME  — centred, large, accent, underline border
+  const mkName = t => new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: sp(0, 100),
+    border: { bottom: { style: BorderStyle.SINGLE, size: 10, color: ACC, space: 6 } },
+    children: [ new TextRun({
+      text: t.toUpperCase(), bold: true, size: 52,
+      color: ACC, font: 'Calibri'
+    })]
+  });
+
+  // CONTACT  — centred, small, muted grey
+  const mkContact = t => new Paragraph({
+    alignment: AlignmentType.CENTER,
+    spacing: sp(0, 40),
+    children: [ new TextRun({ text: t, size: 18, color: '777777', font: 'Calibri' }) ]
+  });
+
+  // SECTION HEADING  — bold accent, bottom border rule
+  const mkSection = t => new Paragraph({
+    spacing: sp(260, 80),
+    border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: ACC, space: 3 } },
+    children: [ new TextRun({
+      text: t.replace(/^[-—\s•●★]+|[-—\s]+$/g,'').trim().toUpperCase(),
+      bold: true, size: 22, color: ACC, font: 'Calibri'
+    })]
+  });
+
+  // JOB TITLE  — bold accent, extra spacing above
+  const mkJobTitle = t => new Paragraph({
+    spacing: sp(180, 40),
+    children: [ new TextRun({
+      text: t.replace(/\*/g,'').trim(), bold: true,
+      size: 21, color: ACC, font: 'Calibri'
+    })]
+  });
+
+  // ROLE CONTEXT  — italic, muted
+  const mkItalic = t => new Paragraph({
+    spacing: sp(0, 50),
+    children: [ new TextRun({
+      text: t.trim(), size: 19, italics: true,
+      color: '555555', font: 'Calibri'
+    })]
+  });
+
+  // BODY TEXT  — standard
+  const mkBody = t => new Paragraph({
+    spacing: sp(0, 80),
+    children: [ new TextRun({ text: t.trim(), size: 20, font: 'Calibri', color: '222222' }) ]
+  });
+
+  // SALUTATION (cover letter)  — bold accent
+  const mkSalutation = t => new Paragraph({
+    spacing: sp(140, 50),
+    children: [ new TextRun({
+      text: t.trim(), bold: true, size: 21,
+      color: ACC, font: 'Calibri'
+    })]
+  });
+
+  // DEGREE / CREDENTIAL  — bold dark
+  const mkDegree = t => new Paragraph({
+    spacing: sp(0, 60),
+    children: [ new TextRun({
+      text: t.trim(), bold: true, size: 20,
+      font: 'Calibri', color: '222222'
+    })]
+  });
+
+  // SKILLS ROW  — pipe-separated with accent dividers
+  const mkSkillRow = t => {
+    const parts = t.split('|').map(s => s.trim()).filter(Boolean);
+    const runs = [];
+    parts.forEach((sk, i) => {
+      runs.push(new TextRun({ text: sk, size: 20, font: 'Calibri', color: '222222' }));
+      if (i < parts.length - 1)
+        runs.push(new TextRun({ text: '  |  ', size: 20, bold: true, color: ACC, font: 'Calibri' }));
+    });
+    return new Paragraph({ spacing: sp(0, 60), children: runs });
+  };
+
+  // SPACER  — blank line with small spacing
+  const mkSpacer = () => new Paragraph({ spacing: sp(0, 40) });
+
+  // ── Build paragraph list ─────────────────────────────────────
+  const children = [];
+  const allLines = text.split('\n');
+  let li = 0;  // line index (for contact detection)
+
+  for (const line of allLines) {
+    const l = line.trim();
+    if (!l) { children.push(mkSpacer()); continue; }
+
+    // First non-empty line = name
+    if (li === 0) { children.push(mkName(l)); li++; continue; }
+
+    if (isSection(l))              { children.push(mkSection(l));    li++; continue; }
+
+    if (isBullet(l)) {
+      children.push(new Paragraph({
+        numbering: { reference: refName, level: 0 },
+        spacing: sp(0, 50),
+        children: [ new TextRun({
+          text: l.replace(/^[•●★–—]\s*/,'').trim(),
+          size: 20, font: 'Calibri', color: '222222'
+        })]
+      }));
+      li++; continue;
+    }
+
+    if (isContact(l, li))          { children.push(mkContact(l));    li++; continue; }
+    if (isCoverLetter && isSalutation(l)) { children.push(mkSalutation(l)); li++; continue; }
+    if (isJobTitle(l))             { children.push(mkJobTitle(l));   li++; continue; }
+
+    if (!isCoverLetter && li > 5 && l.length < 220 && !isSection(l) &&
+        /^(Led|Provided|Served|Responsible|Managed|Oversaw|Supported|Coordinated|Directed|Owned|Reported|Analysed|Developed|Implemented|Delivered)/i.test(l)) {
+      children.push(mkItalic(l)); li++; continue;
+    }
+
+    if (isSkillRow(l))             { children.push(mkSkillRow(l));   li++; continue; }
+    if (isDegree(l))               { children.push(mkDegree(l));     li++; continue; }
+
+    children.push(mkBody(l));
+    li++;
+  }
+
+  // ── Assemble Document ────────────────────────────────────────
+  const theDoc = new Document({
+    numbering: {
+      config: [{
+        reference: refName,
+        levels: [{
+          level: 0,
+          format: LevelFormat.BULLET,
+          text: '\u2022',
+          alignment: AlignmentType.LEFT,
+          style: {
+            paragraph: { indent: { left: 480, hanging: 240 } },
+            run: { size: 20, color: ACC, font: 'Calibri' }
+          }
+        }]
+      }]
+    },
+    styles: {
+      default: {
+        document: { run: { font: 'Calibri', size: 20, color: '222222' } }
+      }
+    },
+    sections: [{
+      properties: {
+        page: {
+          size:   { width: PW, height: PH },
+          margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN }
+        }
+      },
+      children
+    }]
+  });
+
+  const buffer = await Packer.toBuffer(theDoc);
+  return new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  });
+}
+
+// ════════════════════════════════════════════
+//  HTML BUILDER (Google Docs)
+// ════════════════════════════════════════════
+function buildHTML(text, accentHex, isCoverLetter) {
+  const ac = accentHex.startsWith('#') ? accentHex : '#' + accentHex;
+  let body = '', li = 0;
+
+  for (const raw of text.split('\n')) {
+    const l = raw.trim();
+    if (!l) { body += '<br>\n'; continue; }
+
+    if (li === 0) {
+      body += '<h1 style="font-family:Calibri,Arial,sans-serif;font-size:22pt;color:'+ac+';text-align:center;border-bottom:2px solid '+ac+';padding-bottom:6px;margin:0 0 8px;">' + l + '</h1>\n';
+      li++; continue;
+    }
+    if (isSection(l)) {
+      const clean = l.replace(/^[-—\s•●]+|[-—\s]+$/g,'').trim().toUpperCase();
+      body += '<h2 style="font-family:Calibri,Arial,sans-serif;font-size:10.5pt;color:'+ac+';border-bottom:1px solid '+ac+';padding-bottom:2px;margin:14px 0 4px;">' + clean + '</h2>\n';
+      li++; continue;
+    }
+    if (isBullet(l)) {
+      const bt = l.replace(/^[•●★–—]\s*/,'').trim();
+      body += '<ul style="margin:2px 0 2px 18px;font-family:Calibri,Arial,sans-serif;font-size:10pt;"><li>' + bt + '</li></ul>\n';
+      li++; continue;
+    }
+    if (isContact(l, li)) {
+      body += '<p style="font-family:Calibri,Arial,sans-serif;font-size:9pt;color:#666;text-align:center;margin:2px 0;">' + l + '</p>\n';
+      li++; continue;
+    }
+    if (isCoverLetter && isSalutation(l)) {
+      body += '<p style="font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;color:'+ac+';margin:12px 0 4px;">' + l + '</p>\n';
+      li++; continue;
+    }
+    if (isJobTitle(l)) {
+      body += '<p style="font-family:Calibri,Arial,sans-serif;font-size:10.5pt;font-weight:bold;color:'+ac+';margin:10px 0 2px;">' + l + '</p>\n';
+      li++; continue;
+    }
+    if (isSkillRow(l)) {
+      const skills = l.split('|').map(s=>s.trim()).filter(Boolean).join(' &nbsp;·&nbsp; ');
+      body += '<p style="font-family:Calibri,Arial,sans-serif;font-size:10pt;color:#333;margin:3px 0;">' + skills + '</p>\n';
+      li++; continue;
+    }
+    if (isDegree(l)) {
+      body += '<p style="font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;margin:3px 0;">' + l + '</p>\n';
+      li++; continue;
+    }
+    body += '<p style="font-family:Calibri,Arial,sans-serif;font-size:10pt;color:#333;margin:3px 0;line-height:1.6;">' + l + '</p>\n';
+    li++;
+  }
+
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CV Builder Pro</title>'
+    + '<style>body{margin:2.5cm;font-family:Calibri,Arial,sans-serif;font-size:10pt;line-height:1.6;}h1,h2,p,ul,li{page-break-inside:avoid;}</style>'
+    + '<\/head><body>\n' + body
+    + '<hr style="margin-top:20px;border:none;border-top:1px solid #ddd;">'
+    + '<p style="font-size:8pt;color:#aaa;text-align:center;">Generated by CV Builder Pro</p>'
+    + '<\/body><\/html>';
+}
+
+// ════════════════════════════════════════════
+//  RTF BUILDER (Apple Pages)
+// ════════════════════════════════════════════
+function buildRTF(text, accentRGB, isCoverLetter) {
+  const [ar,ag,ab] = accentRGB;
+  const rtfEsc = s => s.replace(/\\/g,'\\\\').replace(/\{/g,'\\{').replace(/\}/g,'\\}').replace(/[^\x00-\x7F]/g, ch => '\\u' + ch.charCodeAt(0) + '?');
+  let body = '', li = 0;
+
+  for (const raw of text.split('\n')) {
+    const l = raw.trim();
+    if (!l) { body += '\\par\n'; continue; }
+
+    if (li === 0) { body += '\\pard\\qc\\sb200\\sa80{\\b\\fs44\\cf1 ' + rtfEsc(l) + '}\\par\n'; li++; continue; }
+    if (isSection(l)) {
+      const clean = l.replace(/^[-—\s•●]+|[-—\s]+$/g,'').trim().toUpperCase();
+      body += '\\pard\\ql\\sb240\\sa60{\\b\\fs21\\cf1 ' + rtfEsc(clean) + '}\\par\n'
+            + '\\pard\\ql\\sb0\\sa60{\\cf1\\brdrb\\brdrs\\brdrw8\\brdrsp4 }\\par\n';
+      li++; continue;
+    }
+    if (isBullet(l)) {
+      body += '\\pard\\ql\\li360\\fi-180\\sb60\\sa60\\cf2 \\bullet  ' + rtfEsc(l.replace(/^[•●★–—]\s*/,'').trim()) + '\\par\n';
+      li++; continue;
+    }
+    if (isContact(l, li)) { body += '\\pard\\qc\\sb60\\sa60\\fs18\\cf3 ' + rtfEsc(l) + '\\par\n'; li++; continue; }
+    if (isCoverLetter && isSalutation(l)) { body += '\\pard\\ql\\sb200\\sa60{\\b\\fs20\\cf1 ' + rtfEsc(l) + '}\\par\n'; li++; continue; }
+    if (isJobTitle(l)) { body += '\\pard\\ql\\sb180\\sa40{\\b\\fs21\\cf1 ' + rtfEsc(l) + '}\\par\n'; li++; continue; }
+    if (isSkillRow(l)) {
+      const skills = l.split('|').map(s=>rtfEsc(s.trim())).filter(Boolean).join('  \\bullet  ');
+      body += '\\pard\\ql\\sb60\\sa40\\fs20\\cf2 ' + skills + '\\par\n';
+      li++; continue;
+    }
+    if (isDegree(l)) { body += '\\pard\\ql\\sb60\\sa40{\\b\\fs20\\cf2 ' + rtfEsc(l) + '}\\par\n'; li++; continue; }
+    body += '\\pard\\ql\\sb40\\sa50\\fs20\\cf2 ' + rtfEsc(l) + '\\par\n'; li++;
+  }
+
+  return '{\\rtf1\\ansi\\ansicpg1252\\cocoartf2639\n'
+    + '{\\fonttbl\\f0\\fswiss\\fcharset0 Calibri;}\n'
+    + '{\\colortbl;\\red'+ar+'\\green'+ag+'\\blue'+ab+';\\red34\\green34\\blue34;\\red120\\green120\\blue120;}\n'
+    + '{\\info{\\title CV Builder Pro}}\n'
+    + '\\paperw12240\\paperh15840\n\\margl1440\\margr1440\\margt1440\\margb1440\n\\f0\\fs20\n'
+    + body + '}';
+}
+
+// ════════════════════════════════════════════
+//  CV DOWNLOAD FUNCTIONS
+// ════════════════════════════════════════════
+
+async function downloadTxt() {
+  if (!generatedCV) { alert('Please generate your CV first.'); return; }
+  const restore = btnLoading('downloadTxtBtn', 'Preparing…');
+  try {
+    const blob = new Blob(['\uFEFF' + generatedCV.replace(/\r\n/g,'\n').trim() + '\n'], { type:'text/plain;charset=utf-8' });
+    await triggerDownload(blob, 'CV_Optimised.txt');
+    restore('Downloaded!');
+  } catch(e) { restore(); alert('Text download failed: ' + e.message); }
+}
+
+async function downloadPdf() {
+  if (!generatedCV) { alert('Please generate your CV first.'); return; }
+  const restore = btnLoading('downloadPdfBtn', 'Building PDF…');
+  try {
+    const blob = await buildPDF(generatedCV, getAccentRGB(selectedTemplate||'1A'), false);
+    await triggerDownload(blob, 'CV_Optimised.pdf');
+    restore('Downloaded!');
+  } catch(e) { restore(); alert('PDF failed: ' + e.message); }
+}
+
+async function downloadDocx() {
+  if (!generatedCV) { alert('Please generate your CV first.'); return; }
+  const restore = btnLoading('downloadDocxBtn', 'Building Word…');
+  try {
+    const blob = await buildDOCX(generatedCV, getAccentHex(selectedTemplate||'1A'), 'cvBullets', false);
+    await triggerDownload(blob, 'CV_Optimised.docx');
+    restore('Downloaded!');
+  } catch(e) { restore(); alert('Word failed: ' + e.message); }
+}
+
+async function downloadForGoogleDocs() {
+  if (!generatedCV) { alert('Please generate your CV first.'); return; }
+  const restore = btnLoading('downloadGdocsBtn', 'Preparing…');
+  try {
+    const html = buildHTML(generatedCV, getAccentHex(selectedTemplate||'1A'), false);
+    const blob = new Blob([html], { type:'text/html;charset=utf-8' });
+    await triggerDownload(blob, 'CV_For_GoogleDocs.html');
+    restore('Downloaded!');
+    setTimeout(() => alert('To open in Google Docs:\n1. Go to drive.google.com\n2. Upload CV_For_GoogleDocs.html\n3. Right-click → Open with Google Docs'), 300);
+  } catch(e) { restore(); alert('Google Docs export failed: ' + e.message); }
+}
+
+async function downloadForPages() {
+  if (!generatedCV) { alert('Please generate your CV first.'); return; }
+  const restore = btnLoading('downloadPagesBtn', 'Preparing…');
+  try {
+    const rtf = buildRTF(generatedCV, getAccentRGB(selectedTemplate||'1A'), false);
+    const blob = new Blob([rtf], { type:'application/rtf;charset=utf-8' });
+    await triggerDownload(blob, 'CV_For_ApplePages.rtf');
+    restore('Downloaded!');
+    setTimeout(() => alert('Double-click CV_For_ApplePages.rtf on your Mac to open in Pages.'), 300);
+  } catch(e) { restore(); alert('Apple Pages export failed: ' + e.message); }
+}
+
+// ════════════════════════════════════════════
+//  COVER LETTER DOWNLOAD FUNCTIONS
+// ════════════════════════════════════════════
+
+async function downloadCLTxt() {
+  if (!generatedCL) { alert('Please generate your cover letter first.'); return; }
+  const restore = btnLoading('clTxtBtn', 'Preparing…');
+  try {
+    const blob = new Blob(['\uFEFF' + generatedCL.replace(/\r\n/g,'\n').trim() + '\n'], { type:'text/plain;charset=utf-8' });
+    await triggerDownload(blob, 'CoverLetter_Optimised.txt');
+    restore('Downloaded!');
+  } catch(e) { restore(); alert('Text download failed: ' + e.message); }
+}
+
+async function downloadCLPdf() {
+  if (!generatedCL) { alert('Please generate your cover letter first.'); return; }
+  const restore = btnLoading('clPdfBtn', 'Building PDF…');
+  try {
+    const accent = ['CL2'].includes(selectedCLTemplate) ? [201,168,76] : [26,39,68];
+    const blob = await buildPDF(generatedCL, accent, true);
+    await triggerDownload(blob, 'CoverLetter_Optimised.pdf');
+    restore('Downloaded!');
+  } catch(e) { restore(); alert('PDF failed: ' + e.message); }
+}
+
+async function downloadCLDocx() {
+  if (!generatedCL) { alert('Please generate your cover letter first.'); return; }
+  const restore = btnLoading('clDocxBtn', 'Building Word…');
+  try {
+    const acc = ['CL2'].includes(selectedCLTemplate) ? 'C9A84C' : '1A2744';
+    const blob = await buildDOCX(generatedCL, acc, 'clBullets', true);
+    await triggerDownload(blob, 'CoverLetter_Optimised.docx');
+    restore('Downloaded!');
+  } catch(e) { restore(); alert('Word failed: ' + e.message); }
+}
+
+async function downloadCLGoogleDocs() {
+  if (!generatedCL) { alert('Please generate your cover letter first.'); return; }
+  const restore = btnLoading('clGdocsBtn', 'Preparing…');
+  try {
+    const acc = ['CL2'].includes(selectedCLTemplate) ? 'C9A84C' : '1A2744';
+    const html = buildHTML(generatedCL, acc, true);
+    const blob = new Blob([html], { type:'text/html;charset=utf-8' });
+    await triggerDownload(blob, 'CoverLetter_For_GoogleDocs.html');
+    restore('Downloaded!');
+    setTimeout(() => alert('To open in Google Docs:\n1. Upload CoverLetter_For_GoogleDocs.html to drive.google.com\n2. Right-click → Open with Google Docs'), 300);
+  } catch(e) { restore(); alert('Google Docs export failed: ' + e.message); }
+}
+
+async function downloadCLPages() {
+  if (!generatedCL) { alert('Please generate your cover letter first.'); return; }
+  const restore = btnLoading('clPagesBtn', 'Preparing…');
+  try {
+    const accent = ['CL2'].includes(selectedCLTemplate) ? [201,168,76] : [26,39,68];
+    const rtf = buildRTF(generatedCL, accent, true);
+    const blob = new Blob([rtf], { type:'application/rtf;charset=utf-8' });
+    await triggerDownload(blob, 'CoverLetter_For_ApplePages.rtf');
+    restore('Downloaded!');
+    setTimeout(() => alert('Double-click CoverLetter_For_ApplePages.rtf on your Mac to open in Pages.'), 300);
+  } catch(e) { restore(); alert('Apple Pages export failed: ' + e.message); }
+}
+</script>
+</body>
+</html>
+
