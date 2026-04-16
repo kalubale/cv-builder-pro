@@ -2380,7 +2380,9 @@ function renderPayPalButtons() {
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ amount: '5.99', description: 'CV Builder Pro — CV + Cover Letter Bundle' }),
         });
-        const data = await res.json();
+        const rawCreate = await res.text();
+        let data;
+        try { data = JSON.parse(rawCreate); } catch { throw new Error('Payment service error (HTTP ' + res.status + '). Please try again.'); }
         if (!res.ok || data.error) throw new Error(data.error || 'Could not create order');
         return data.orderID;
       } catch(err) {
@@ -2401,7 +2403,9 @@ function renderPayPalButtons() {
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ orderID: data.orderID }),
         });
-        const result = await res.json();
+        const rawCapture = await res.text();
+        let result;
+        try { result = JSON.parse(rawCapture); } catch { throw new Error('Payment verification error (HTTP ' + res.status + '). Contact support.'); }
 
         if (!res.ok || result.error) throw new Error(result.error || 'Capture failed');
         if (result.status !== 'COMPLETED') throw new Error('Payment not completed: ' + result.status);
@@ -2793,10 +2797,8 @@ async function callAPI(payload, retries=3, delayMs=2500) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     let res;
     try {
-      // When hitting the proxy we only need Content-Type.
-      // When hitting Anthropic directly (local dev) the key must be in the header —
-      // replace 'YOUR_KEY_HERE' with your key for local testing only.
       const headers = { 'Content-Type': 'application/json' };
+      // Local dev only — replace YOUR_KEY_HERE with your key for local testing
       if (endpoint === DIRECT_URL) {
         headers['x-api-key']         = 'YOUR_KEY_HERE';
         headers['anthropic-version'] = '2023-06-01';
@@ -2808,8 +2810,29 @@ async function callAPI(payload, retries=3, delayMs=2500) {
         body:    JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      // Read as text first — NEVER call .json() directly
+      // because error responses from Netlify can be HTML, not JSON
+      const rawText = await res.text();
 
+      // Try to parse as JSON
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        // Got HTML or empty response — extract a meaningful message
+        const preview = rawText.slice(0, 200).replace(/<[^>]+>/g, '').trim();
+        throw new Error(
+          res.status === 404
+            ? 'Function not found (404). Make sure generate.js is deployed in netlify/functions/ and redeploy.'
+            : res.status === 500
+            ? 'Server error (500). Check that ANTHROPIC_API_KEY is set in Netlify environment variables.'
+            : res.status === 401
+            ? 'Unauthorised (401). Your ANTHROPIC_API_KEY is invalid or expired.'
+            : 'Unexpected response (HTTP ' + res.status + '): ' + (preview || 'empty response')
+        );
+      }
+
+      // Handle API-level errors returned as JSON
       if (data.error) {
         const msg         = data.error.message || data.error.type || 'API error';
         const isTransient = res.status === 529 || res.status === 429 ||
@@ -2825,7 +2848,13 @@ async function callAPI(payload, retries=3, delayMs=2500) {
 
     } catch (err) {
       lastErr = err;
-      if (attempt < retries) { await sleep(delayMs * attempt); continue; }
+      const isRetryable = !res || res.status === 429 || res.status === 529 || res.status >= 500;
+      if (isRetryable && attempt < retries) {
+        await sleep(delayMs * attempt);
+        continue;
+      }
+      // Non-retryable error — throw immediately
+      throw err;
     }
   }
 
